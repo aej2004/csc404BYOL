@@ -91,6 +91,8 @@ write movies starring "Tom Hanks"
 write stars in "The Lion King" where movie is "The Little Mermaid"
 ```
 
+<p>Outputs:</p>
+
 ```
 outputs all the movies that star Tom Hanks
 outputs all the stars that are in both movies
