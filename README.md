@@ -9,47 +9,102 @@
 
 <p>Link To Database: https://www.kaggle.com/datasets/rajugc/imdb-movies-dataset-based-on-genre?resource=download </p>
 
+## Grammar: 
+
+```
+findStmt -> "find" kind ("starring" | "directed by" | "for" | "in" | "of") str (where | without. <condition>)?
+
+haveStmt -> "have" ... = <findStmt>
+
+sayStmt -> "say" str (rating | summary) (num | str)
+
+writeStmt -> "write" kind ("starring" | "directed by" | "for" | "in" | "of") str (where | without. <condition>)?
+
+kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director" | ?age-appropriate
+
+condition -> str | kind "is" str | <conditon> > <condition>
+```
+
 ## Examples: 
 
 ### Example Program 1 Getter
 
 ```
-mov.director("The Lion King");
-mov.action.top5;
+find movies starring "Tom Hanks"
+find movies directed by "Chris Columbus"
+find genre for "Tom Hanks"
+find stars in "The Lion King"
+find genre for "The Lion King"
+find summary of "The Lion King"
+find length of "The Little Mermaid"
 ```
 
 <p>Outputs:</p>
 
 ```
-Rob Minkoff, Roger Allers
-17 Again, Pitch Perfect, Jumanji, Anyone But You, She's The Man
+The string or the list of strings that go with the kind and string given. 
 ```
 
-### Example Program 2  Defining Variables
+### Example Program 2 Declaration
 
 ```
-put a = "The Lion King";
-print a; 
-```
-
-<p>Outputs:</p>
-
-```
-The Lion King
-```
-
-### Example Program 3 Built-in Functions
-
-```
-isFamFriendly("The Lion King");
-
-put lion = "The Lion King";
-mov.cerification(lion);
+have tomMovies = find movies with "tom hanks"
+find stars in tomMovies without "tom hanks"
+have lkActors = find stars in "The Lion King"
+find movies in lkActors without "The Lion King"
 ```
 
 <p>Outputs:</p>
 
 ```
-true
-G
+Stores the string, list of strings, or double under the given variables name. 
+```
+
+### Example Program 3 Setter
+
+```
+say "Sing 2" rating 9.5
+find rating for "Tori Kelly"
+```
+
+<p>Outputs:</p>
+
+```
+Returns the average rating for Tori Kelly changed to include the new rating the movie "Sing 2" that she's in.
+```
+
+```
+say "The Little Mermaid" summary "A great child friendly movie about ..."
+find summary for "The Little Mermaid"
+```
+
+<p>Outputs:</p>
+
+```
+Returns the new summary for the film that the person just wrote. 
+```
+
+### Example Program 4 Return/Print Output
+
+```
+write movies starring "Tom Hanks"
+write stars in "The Lion King" where movie is "The Little Mermaid"
+```
+
+```
+outputs all the movies that star Tom Hanks
+outputs all the stars that are in both movies
+```
+
+### Example Program 4 Conditionals
+
+```
+find movies with "tom hanks" where genre is "action"
+find stars in "The Lion King" where movie is "The Little Mermaid"
+```
+
+<p>Outputs:</p>
+
+```
+returns the movie with the given condition for the certain kind within the movie. 
 ```
