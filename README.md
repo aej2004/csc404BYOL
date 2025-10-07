@@ -98,7 +98,7 @@ outputs all the movies that star Tom Hanks
 outputs all the stars that are in both movies
 ```
 
-### Example Program 4 Conditionals
+### Example Program 5 Conditionals
 
 ```
 find movies with "tom hanks" where genre is "action"
