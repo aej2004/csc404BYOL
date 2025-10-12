@@ -1,0 +1,13 @@
+have tomMovies = find movies with "tom hanks"
+find stars in tomMovies without "tom hanks"
+have lkActors = find stars in "The Lion King"
+find movies in lkActors without "The Lion King"
+
+say "Sing 2" rating 9.5
+find rating for "Tori Kelly"
+
+write movies starring "Tom Hanks"
+write stars in "The Lion King" where movie is "The Little Mermaid"
+
+find movies with "tom hanks" where genre is "action"
+find stars in "The Lion King" where movie is "The Little Mermaid"
