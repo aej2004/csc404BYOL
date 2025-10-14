@@ -14,6 +14,8 @@ public class MovScanner {
     private int current = 0;
     private int line = 1;
 
+    
+
     private static final Map<String, MovTokenType> keywords;
     static {
         keywords = new HashMap<>();
@@ -42,17 +44,17 @@ public class MovScanner {
         keywords.put("age_appropriate", AGE_APPROPRIATE);
     }
 
-    Scanner(String source) {
+    MovScanner(String source) {
         this.source = source;
     }
 
-    List<Token> scanTokens() { 
+    List<MovToken> scanTokens() { 
         while (!isAtEnd()) {
             start = current;
             scanToken();
         }
 
-        tokens.add(new Token(TokenType.EOF, "", null, line));
+        tokens.add(new MovToken(MovTokenType.EOF, "", null, line));
         return tokens;
     }
 
@@ -60,8 +62,7 @@ public class MovScanner {
         char c = advance();
         switch (c) {    
 
-            case '=' -> addToken(match('=') ? EQUAL);
-
+            case '=' -> addToken(EQUAL);
             case ' ', '\r', '\t' -> {} // Ignore whitespace.
             case '\n' -> line++;
 
@@ -73,7 +74,7 @@ public class MovScanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    Lox.error(line, "Unexpected character.");
+                    Mov.error(line, "Unexpected character.");
                 }
             }
         }
@@ -107,7 +108,7 @@ public class MovScanner {
         }
 
         if (isAtEnd()) {
-            Lox.error(line, "Unterminated string.");
+            Mov.error(line, "Unterminated string.");
             return;
         }
 

@@ -3,15 +3,17 @@ package mov;
 enum  MovTokenType {
 
     // Keyword 
-   FIND, HAVE, SAY, WRITE, WHERE, WITHOUT, IS, FOR, IN, OF, WITH, STARRING, DIRECTED_BY,
+    FIND, HAVE, SAY, WRITE, WHERE, WITHOUT, IS, FOR, IN, OF, WITH, STARRING, DIRECTED_BY,
 
-   // Kinds 
-   MOVIES, RATINGS, GENRE, STARS, YEAR, SUMMARY, LENGTH, DIRECTOR, AGE_APPROPRIATE,
+    // Kinds 
+    MOVIES, RATINGS, GENRE, STARS, YEAR, SUMMARY, LENGTH, DIRECTOR, AGE_APPROPRIATE,
 
-   // Literals
+    // Literals
     IDENTIFIER, STRING, NUMBER,
 
     // Symbols
-    EQUAL
+    EQUAL,
+
+    EOF
     
 }
