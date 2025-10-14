@@ -1,71 +1,170 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+package mov;
+
+import static mov.MovTokenType.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MovScanner {
+    private final String source;
+    private final List<MovToken> tokens = new ArrayList<>();
+    private int start = 0;
+    private int current = 0;
+    private int line = 1;
 
-    // Method to tokenize a line
-    public static void tokenizeLine(String line){
-        String[] keywords = { "find", "have", "say", "write", "where", "without", "is", "for", "in", "of",
-                "with", "starring", "directed by"};
-        String[] kinds = {"movies", "ratings", "genre", "stars", "year", "summary", "length", "director", "?age-appropriate"};
-        
-        // Split the line into tokens using regex to handle quoted strings
-        Pattern pattern = Pattern.compile("\"[^\"]*\"|\\S+");
-        Matcher matcher = pattern.matcher(line);
-        
-        while (matcher.find()) {
-            String token = matcher.group();
-            if (token.isEmpty()) continue;
-            if (isInArray(token, keywords)){
-                System.out.println("Token: Keyword: " + token);
-            } else if (isInArray(token, kinds)){
-                System.out.println("Token: Kind: " + token);
-                // Check if the word is a string in quotes
-            } else if (token.startsWith("\"") && token.endsWith("\"")) {
-                System.out.println("Token: String: " + token);
-               // Check if the word is a number or decimal
-            } else if (token.matches("\\d+(\\.\\d+)?")) {
-                System.out.println("Token: Number: " + token);
-            } else if (token.equals("=")){
-                System.out.println("Token: Operator: " + token);
-            // If its not any of the above just treat it as an identifier
-            } else {
-                System.out.println("Token: Identifier: " + token);
+    private static final Map<String, MovTokenType> keywords;
+    static {
+        keywords = new HashMap<>();
+        keywords.put("find", FIND);
+        keywords.put("have", HAVE);
+        keywords.put("say", SAY);
+        keywords.put("write", WRITE);
+        keywords.put("where", WHERE);
+        keywords.put("without", WITHOUT);
+        keywords.put("is", IS);
+        keywords.put("for", FOR);
+        keywords.put("in", IN);
+        keywords.put("of", OF);
+        keywords.put("with", WITH);
+        keywords.put("starring", STARRING);
+        keywords.put("directed_by", DIRECTED_BY);
+
+        keywords.put("movies", MOVIES);
+        keywords.put("ratings", RATINGS);
+        keywords.put("genre", GENRE);
+        keywords.put("stars", STARS);
+        keywords.put("year", YEAR);
+        keywords.put("summary", SUMMARY);
+        keywords.put("length", LENGTH);
+        keywords.put("director", DIRECTOR);
+        keywords.put("age_appropriate", AGE_APPROPRIATE);
+    }
+
+    Scanner(String source) {
+        this.source = source;
+    }
+
+    List<Token> scanTokens() { 
+        while (!isAtEnd()) {
+            start = current;
+            scanToken();
+        }
+
+        tokens.add(new Token(TokenType.EOF, "", null, line));
+        return tokens;
+    }
+
+    private void scanToken() {
+        char c = advance();
+        switch (c) {    
+
+            case '=' -> addToken(match('=') ? EQUAL);
+
+            case ' ', '\r', '\t' -> {} // Ignore whitespace.
+            case '\n' -> line++;
+
+            case '"' -> string();
+
+            default -> {
+                if (isDigit(c)) {
+                    number();
+                } else if (isAlpha(c)) {
+                    identifier();
+                } else {
+                    Lox.error(line, "Unexpected character.");
+                }
+            }
         }
     }
+
+    private void identifier() {
+        while (isAlphaNumeric(peek())) advance();
+
+        String text = source.substring(start, current);
+        MovTokenType type = keywords.get(text);
+        if (type == null) type = IDENTIFIER;
+        addToken(type);
+    }
+
+    private void number() {
+        while (isDigit(peek())) advance();
+
+        if (peek() == '.' && isDigit(peekNext())) {
+            advance(); // consume the "."
+
+            while (isDigit(peek())) advance();
+        }
+
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
+
+    private void string() {
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n') line++;
+            advance();
+        }
+
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string.");
+            return;
+        }
+
+        advance(); // The closing ".
+
+        String value = source.substring(start + 1, current - 1);
+        addToken(STRING, value);
+    }
+
+    private boolean match(char expected) {
+        if (isAtEnd()) return false;
+        if (source.charAt(current) != expected) return false;
+
+        current++;
+        return true;
+    }
+
+    private char peek() {
+        if (isAtEnd()) return '\0';
+        return source.charAt(current);
+    }
+
+    private char peekNext() {
+        if (current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
+    }
+
+    private boolean isAlpha(char c) {
+        return (c >= 'a' && c <= 'z') ||
+               (c >= 'A' && c <= 'Z') ||
+                c == '_';
+    }
+
+    private boolean isAlphaNumeric(char c) {
+        return isAlpha(c) || isDigit(c);
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private boolean isAtEnd() {
+        return current >= source.length();
+    }
+
+    private char advance() {
+        return source.charAt(current++);
+    }
+
+    private void addToken(MovTokenType type) {
+        addToken(type, null);
+    }
+
+    private void addToken(MovTokenType type, Object literal) {
+        String text = source.substring(start, current);
+        tokens.add(new MovToken(type, text, literal, line));
+    }
+
 }
-    //Helper Method to check if a string is in an array
-    public static boolean isInArray(String token, String[] array){
-        for (String word : array){
-            if (word.equals(token)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static void main(String[] args) {
-        // Load .mov file
-        try {
-            File file = new File("sample.mov");
-            Scanner scanner = new java.util.Scanner(file);
-            // Read the file line by line
-            while (scanner.hasNextLine()){
-                String line = scanner.nextLine();
-                System.out.println(line);
-                // Tokenize the line
-                tokenizeLine(line);
-            }
-            scanner.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found.");
-
-        }
-    }
-}            
-                
-    
 
