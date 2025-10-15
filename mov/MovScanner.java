@@ -1,11 +1,11 @@
 package mov;
 
-import static mov.MovTokenType.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static mov.MovTokenType.*;
 
 public class MovScanner {
     private final String source;

@@ -1,8 +1,8 @@
 package mov;
 
-import static mov.MovTokenType.FOR;
-
 import java.util.List;
+
+import static mov.MovTokenType.*;
 
 public class MovParser {
     
@@ -14,6 +14,36 @@ public class MovParser {
 
     MovParser(List<MovToken> tokens) {
         this.tokens = tokens;
+    }
+
+    List<MovStmt> parse() {
+        List<MovStmt> statements = new java.util.ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(declaration());
+        }
+        return statements;
+    }
+
+    private MovExpr expression() {
+        return assignment();
+    }
+
+    private MovStmt declaration() {
+        try {
+            if (match(KIND)) return kindDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+
+    private MovStmt statement() {
+        if (match(FIND)) return findStatement();
+        if (match(HAVE)) return haveStatement();
+        if (match(SAY)) return sayStatement();
+        if (match(WRITE)) return writeStatement();
+        throw error(peek(), "Expect statement.");
     }
 
     /* General parsing utility methods */
