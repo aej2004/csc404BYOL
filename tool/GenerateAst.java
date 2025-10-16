@@ -19,8 +19,8 @@ public class GenerateAst {
         ));
 
         defineAst(outputDir, "MovStmt", Arrays.asList(
-                "Find       : MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal",
-                "Write      : MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal",
+                "Find       : MovToken keyword, MovToken kind, MovToken descriptor, MovToken literal",
+                "Write      : MovToken keyword, MovToken kind, MovToken descriptor, MovToken literal",
                 "Have       : MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression",
                 "Say        : MovToken keyword, MovToken literal1, MovToken kind, MovToken literal2"
         ));

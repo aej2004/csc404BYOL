@@ -13,10 +13,10 @@ abstract class MovStmt {
     R visitSayMovStmt(Say movstmt);
   }
   static class Find extends MovStmt {
-    Find(MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal) {
-      this.keyword1 = keyword1;
+    Find(MovToken keyword, MovToken kind, MovToken descriptor, MovToken literal) {
+      this.keyword = keyword;
       this.kind = kind;
-      this.keyword2 = keyword2;
+      this.descriptor = descriptor;
       this.literal = literal;
     }
 
@@ -25,21 +25,21 @@ abstract class MovStmt {
       return visitor.visitFindMovStmt(this);
     }
 
-    final MovToken keyword1;
+    final MovToken keyword;
     final MovToken kind;
-    final MovToken keyword2;
+    final MovToken descriptor;
     final MovToken literal;
 
     @Override
     public String toString() {
-      return "Find(" + keyword1 + ", " + kind + ", " + keyword2 + ", " + literal + ")";
+      return "Find(" + keyword + ", " + kind + ", " + descriptor + ", " + literal + ")";
     }
   }
   static class Write extends MovStmt {
-    Write(MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal) {
-      this.keyword1 = keyword1;
+    Write(MovToken keyword, MovToken kind, MovToken descriptor, MovToken literal) {
+      this.keyword = keyword;
       this.kind = kind;
-      this.keyword2 = keyword2;
+      this.descriptor = descriptor;
       this.literal = literal;
     }
 
@@ -48,14 +48,14 @@ abstract class MovStmt {
       return visitor.visitWriteMovStmt(this);
     }
 
-    final MovToken keyword1;
+    final MovToken keyword;
     final MovToken kind;
-    final MovToken keyword2;
+    final MovToken descriptor;
     final MovToken literal;
 
     @Override
     public String toString() {
-      return "Write(" + keyword1 + ", " + kind + ", " + keyword2 + ", " + literal + ")";
+      return "Write(" + keyword + ", " + kind + ", " + descriptor + ", " + literal + ")";
     }
   }
   static class Have extends MovStmt {

@@ -28,6 +28,34 @@ public class MovParser {
         return assignment();
     }
 
+    private MovExpr assignment() {
+
+        if(match(EQUAL)) {
+
+            MovToken keyword = previous();
+            MovToken literal = consume(STRING, "Expect literal after 'have'.");
+            MovToken symbol = consume(EQUAL, "Expect symbol after literal.");
+            MovExpr expression = null;
+
+            if (match(EQUAL)) {
+                expression = expression();
+            }
+
+            return new MovExpr.Have(keyword, literal, symbol, expression);
+
+        } else if (match(SAY)) {
+
+            MovToken keyword = peek();
+            MovToken literal1 = consume(STRING, "Expect literal after 'say'.");
+            MovToken kind = consume(KIND, "Expect 'kind' after literal.");
+            MovToken literal2 = consume(LITERAL, "Expect literal after 'kind'.");
+
+            return new MovExpr.Say(keyword, literal1, kind, literal2);
+
+        }
+
+    }
+
     private MovStmt declaration() {
         try {
             if (match(HAVE)) return haveDeclaration();
@@ -39,7 +67,7 @@ public class MovParser {
         }
     }
 
-    private MovExpr haveDeclaration() {
+    private MovStmt haveDeclaration() {
         MovToken keyword = previous();
         MovToken literal = consume(STRING, "Expect literal after 'have'.");
         MovToken symbol = consume(EQUAL, "Expect symbol after literal.");
@@ -49,7 +77,16 @@ public class MovParser {
             expression = expression();
         }
         
-        return new MovExpr.Have(keyword, literal, symbol, expression);
+        return new MovStmt.Have(keyword, literal, symbol, expression);
+    }
+
+    private MovStmt sayDeclaration() {
+        MovToken keyword = previous();
+        MovToken literal1 = consume(STRING, "Expect literal after 'say'.");
+        MovToken kind = consume(KIND, "Expect 'kind' after literal.");
+        MovToken literal2 = consume(STRING, "Expect literal after 'kind'.");
+        
+        return new MovStmt.Say(keyword, literal1, kind, literal2);
     }
 
     private void synchronize() {
@@ -77,12 +114,26 @@ public class MovParser {
 
     private MovStmt statement() {
         if (match(FIND)) return findStatement();
-        if (match(HAVE)) return haveStatement();
-        if (match(SAY)) return sayStatement();
         if (match(WRITE)) return writeStatement();
-        if (match(WHERE)) return whereStatement();
-        if (match(WITHOUT)) return withoutStatement();
         throw error(peek(), "Expect statement.");
+    }
+
+    private MovStmt findStatement() {
+        MovToken keyword = previous();
+        MovToken kind = consume(KIND, "Expect 'kind' after 'find'.");
+        MovToken descriptor = consume(DESCRIPT, "Expect 'where' after 'kind'.");
+        MovToken literal = consume(STRING, "Expect literal after 'where'.");
+
+        return new MovStmt.Find(keyword, kind, descriptor, literal);
+    }
+
+    private MovStmt writeStatement() {
+        MovToken keyword = previous();
+        MovToken kind = consume(KIND, "Expect 'kind' after 'write'.");
+        MovToken descriptor = consume(DESCRIPT, "Expect 'without' after 'kind'.");
+        MovToken literal = consume(STRING, "Expect literal after 'without'.");
+
+        return new MovStmt.Write(keyword, kind, descriptor, literal);
     }
 
     /* General parsing utility methods */
