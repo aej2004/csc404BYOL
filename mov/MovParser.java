@@ -30,7 +30,8 @@ public class MovParser {
 
     private MovStmt declaration() {
         try {
-            if (match(KIND)) return kindDeclaration();
+            if (match(HAVE)) return haveDeclaration();
+            if (match(SAY)) return sayDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -38,14 +39,17 @@ public class MovParser {
         }
     }
 
-    private MovStmt kindDeclaration() {
-        MovToken name = consume(IDENTIFIER, "Expect kind name.");
+    private MovExpr haveDeclaration() {
+        MovToken keyword = previous();
+        MovToken literal = consume(STRING, "Expect literal after 'have'.");
+        MovToken symbol = consume(EQUAL, "Expect symbol after literal.");
+        MovExpr expression = null;
         
-        MovExpr initializer = null;
         if (match(EQUAL)) {
-            initializer = expression();
+            expression = expression();
         }
-
+        
+        return new MovExpr.Have(keyword, literal, symbol, expression);
     }
 
     private void synchronize() {
@@ -60,8 +64,6 @@ public class MovParser {
 
             switch (peek().type) {
                 case FIND:
-                case HAVE:
-                case SAY:
                 case WRITE:
                 case WHERE:
                 case WITHOUT:

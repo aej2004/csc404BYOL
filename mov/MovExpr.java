@@ -7,53 +7,45 @@ import java.util.List;
 
 abstract class MovExpr {
   interface Visitor<R> {
-    R visitHaveMovExpr(Have movexpr);
-    R visitSayMovExpr(Say movexpr);
+    R visitWhereMovExpr(Where movexpr);
+    R visitWithoutMovExpr(Without movexpr);
   }
-  static class Have extends MovExpr {
-    Have(MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression) {
+  static class Where extends MovExpr {
+    Where(MovToken keyword, MovExpr condition) {
       this.keyword = keyword;
-      this.literal = literal;
-      this.symbol = symbol;
-      this.expression = expression;
+      this.condition = condition;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitHaveMovExpr(this);
+      return visitor.visitWhereMovExpr(this);
     }
 
     final MovToken keyword;
-    final MovToken literal;
-    final MovToken symbol;
-    final MovExpr expression;
+    final MovExpr condition;
 
     @Override
     public String toString() {
-      return "Have(" + keyword + ", " + literal + ", " + symbol + ", " + expression + ")";
+      return "Where(" + keyword + ", " + condition + ")";
     }
   }
-  static class Say extends MovExpr {
-    Say(MovToken keyword, MovToken literal1, MovToken kind, MovToken literal2) {
+  static class Without extends MovExpr {
+    Without(MovToken keyword, MovExpr condition) {
       this.keyword = keyword;
-      this.literal1 = literal1;
-      this.kind = kind;
-      this.literal2 = literal2;
+      this.condition = condition;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitSayMovExpr(this);
+      return visitor.visitWithoutMovExpr(this);
     }
 
     final MovToken keyword;
-    final MovToken literal1;
-    final MovToken kind;
-    final MovToken literal2;
+    final MovExpr condition;
 
     @Override
     public String toString() {
-      return "Say(" + keyword + ", " + literal1 + ", " + kind + ", " + literal2 + ")";
+      return "Without(" + keyword + ", " + condition + ")";
     }
   }
 

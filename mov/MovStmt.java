@@ -9,8 +9,8 @@ abstract class MovStmt {
   interface Visitor<R> {
     R visitFindMovStmt(Find movstmt);
     R visitWriteMovStmt(Write movstmt);
-    R visitWhereMovStmt(Where movstmt);
-    R visitWithoutMovStmt(Without movstmt);
+    R visitHaveMovStmt(Have movstmt);
+    R visitSayMovStmt(Say movstmt);
   }
   static class Find extends MovStmt {
     Find(MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal) {
@@ -58,42 +58,50 @@ abstract class MovStmt {
       return "Write(" + keyword1 + ", " + kind + ", " + keyword2 + ", " + literal + ")";
     }
   }
-  static class Where extends MovStmt {
-    Where(MovToken keyword, MovExpr condition) {
+  static class Have extends MovStmt {
+    Have(MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression) {
       this.keyword = keyword;
-      this.condition = condition;
+      this.literal = literal;
+      this.symbol = symbol;
+      this.expression = expression;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWhereMovStmt(this);
+      return visitor.visitHaveMovStmt(this);
     }
 
     final MovToken keyword;
-    final MovExpr condition;
+    final MovToken literal;
+    final MovToken symbol;
+    final MovExpr expression;
 
     @Override
     public String toString() {
-      return "Where(" + keyword + ", " + condition + ")";
+      return "Have(" + keyword + ", " + literal + ", " + symbol + ", " + expression + ")";
     }
   }
-  static class Without extends MovStmt {
-    Without(MovToken keyword, MovExpr condition) {
+  static class Say extends MovStmt {
+    Say(MovToken keyword, MovToken literal1, MovToken kind, MovToken literal2) {
       this.keyword = keyword;
-      this.condition = condition;
+      this.literal1 = literal1;
+      this.kind = kind;
+      this.literal2 = literal2;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWithoutMovStmt(this);
+      return visitor.visitSayMovStmt(this);
     }
 
     final MovToken keyword;
-    final MovExpr condition;
+    final MovToken literal1;
+    final MovToken kind;
+    final MovToken literal2;
 
     @Override
     public String toString() {
-      return "Without(" + keyword + ", " + condition + ")";
+      return "Say(" + keyword + ", " + literal1 + ", " + kind + ", " + literal2 + ")";
     }
   }
 
