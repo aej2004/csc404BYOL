@@ -14,36 +14,16 @@ public class GenerateAst {
         String outputDir = args[0];
 
         defineAst(outputDir, "MovExpr", Arrays.asList(
-                "Assign     : MovToken name, MovExpr value",
-                "Binary     : MovExpr left, MovToken operator, MovExpr right",
-                "Call       : MovExpr callee, MovToken paren," + " List<MovExpr> arguments",
-                "Get        : MovExpr object, MovToken name",
-                "Grouping   : MovExpr expression",
-                "Literal    : Object value",
-                "Logical    : MovExpr left, MovToken operator, MovExpr right",
-                "Set        : MovExpr object, MovToken name, MovExpr value",
-                "Super      : MovToken keyword, MovToken method",
-                "This       : MovToken keyword",
-                "Unary      : MovToken operator, MovExpr right",
-                "Variable   : MovToken name"
+                "Kind   : MovToken name"
         ));
 
         defineAst(outputDir, "MovStmt", Arrays.asList(
-                "Find       : MovToken keyword, MovExpr query, MovToken semicolon",
-                "Have       : MovToken keyword, MovExpr query, MovToken semicolon",
-                "Say        : MovToken keyword, MovExpr expression, MovToken semicolon",
-                "Write      : MovToken keyword, MovExpr expression, MovToken semicolon",
+                "Find       : MovToken keyword, MovToken kind, MovToken keyword, MovToken literal",
+                "Have       : MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression",
+                "Say        : MovToken keyword, MovToken literal, MovToken kind, MovToken literal",
+                "Write      : MovToken keyword, MovToken kind, Mov",
                 "Where     : MovToken keyword, MovExpr condition, MovToken semicolon",
-                "Without   : MovToken keyword, MovExpr condition, MovToken semicolon",
-                "Is       : MovToken keyword, MovExpr condition, MovToken semicolon",
-                "For        : MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body",
-                "In       : MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body",
-                "Of       : MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body",
-                "With      : MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body",
-                "Starring  : MovToken keyword, MovExpr expression, MovToken semicolon",
-                "DirectedBy: MovToken keyword, MovExpr expression, MovToken semicolon",
-                "Kind      : MovToken kind, MovToken name"
-
+                "Without   : MovToken keyword, MovExpr condition, MovToken semicolon"
         ));
     }
 
