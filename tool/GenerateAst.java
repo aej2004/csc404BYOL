@@ -21,9 +21,9 @@ public class GenerateAst {
                 "Find       : MovToken keyword, MovToken kind, MovToken keyword, MovToken literal",
                 "Have       : MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression",
                 "Say        : MovToken keyword, MovToken literal, MovToken kind, MovToken literal",
-                "Write      : MovToken keyword, MovToken kind, Mov",
-                "Where     : MovToken keyword, MovExpr condition, MovToken semicolon",
-                "Without   : MovToken keyword, MovExpr condition, MovToken semicolon"
+                "Write      : MovToken keyword, MovToken kind, MovToken keyword, MovToken literal",
+                "Where     : MovToken keyword, MovExpr condition",
+                "Without   : MovToken keyword, MovExpr condition"
         ));
     }
 
