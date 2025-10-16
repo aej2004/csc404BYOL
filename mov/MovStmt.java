@@ -8,25 +8,16 @@ import java.util.List;
 abstract class MovStmt {
   interface Visitor<R> {
     R visitFindMovStmt(Find movstmt);
-    R visitHaveMovStmt(Have movstmt);
-    R visitSayMovStmt(Say movstmt);
     R visitWriteMovStmt(Write movstmt);
     R visitWhereMovStmt(Where movstmt);
     R visitWithoutMovStmt(Without movstmt);
-    R visitIsMovStmt(Is movstmt);
-    R visitForMovStmt(For movstmt);
-    R visitInMovStmt(In movstmt);
-    R visitOfMovStmt(Of movstmt);
-    R visitWithMovStmt(With movstmt);
-    R visitStarringMovStmt(Starring movstmt);
-    R visitDirectedByMovStmt(DirectedBy movstmt);
-    R visitKindMovStmt(Kind movstmt);
   }
   static class Find extends MovStmt {
-    Find(MovToken keyword, MovExpr query, MovToken semicolon) {
-      this.keyword = keyword;
-      this.query = query;
-      this.semicolon = semicolon;
+    Find(MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal) {
+      this.keyword1 = keyword1;
+      this.kind = kind;
+      this.keyword2 = keyword2;
+      this.literal = literal;
     }
 
     @Override
@@ -34,62 +25,22 @@ abstract class MovStmt {
       return visitor.visitFindMovStmt(this);
     }
 
-    final MovToken keyword;
-    final MovExpr query;
-    final MovToken semicolon;
+    final MovToken keyword1;
+    final MovToken kind;
+    final MovToken keyword2;
+    final MovToken literal;
 
     @Override
     public String toString() {
-      return "Find(" + keyword + ", " + query + ", " + semicolon + ")";
-    }
-  }
-  static class Have extends MovStmt {
-    Have(MovToken keyword, MovExpr query, MovToken semicolon) {
-      this.keyword = keyword;
-      this.query = query;
-      this.semicolon = semicolon;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitHaveMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovExpr query;
-    final MovToken semicolon;
-
-    @Override
-    public String toString() {
-      return "Have(" + keyword + ", " + query + ", " + semicolon + ")";
-    }
-  }
-  static class Say extends MovStmt {
-    Say(MovToken keyword, MovExpr expression, MovToken semicolon) {
-      this.keyword = keyword;
-      this.expression = expression;
-      this.semicolon = semicolon;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitSayMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovExpr expression;
-    final MovToken semicolon;
-
-    @Override
-    public String toString() {
-      return "Say(" + keyword + ", " + expression + ", " + semicolon + ")";
+      return "Find(" + keyword1 + ", " + kind + ", " + keyword2 + ", " + literal + ")";
     }
   }
   static class Write extends MovStmt {
-    Write(MovToken keyword, MovExpr expression, MovToken semicolon) {
-      this.keyword = keyword;
-      this.expression = expression;
-      this.semicolon = semicolon;
+    Write(MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal) {
+      this.keyword1 = keyword1;
+      this.kind = kind;
+      this.keyword2 = keyword2;
+      this.literal = literal;
     }
 
     @Override
@@ -97,20 +48,20 @@ abstract class MovStmt {
       return visitor.visitWriteMovStmt(this);
     }
 
-    final MovToken keyword;
-    final MovExpr expression;
-    final MovToken semicolon;
+    final MovToken keyword1;
+    final MovToken kind;
+    final MovToken keyword2;
+    final MovToken literal;
 
     @Override
     public String toString() {
-      return "Write(" + keyword + ", " + expression + ", " + semicolon + ")";
+      return "Write(" + keyword1 + ", " + kind + ", " + keyword2 + ", " + literal + ")";
     }
   }
   static class Where extends MovStmt {
-    Where(MovToken keyword, MovExpr condition, MovToken semicolon) {
+    Where(MovToken keyword, MovExpr condition) {
       this.keyword = keyword;
       this.condition = condition;
-      this.semicolon = semicolon;
     }
 
     @Override
@@ -120,18 +71,16 @@ abstract class MovStmt {
 
     final MovToken keyword;
     final MovExpr condition;
-    final MovToken semicolon;
 
     @Override
     public String toString() {
-      return "Where(" + keyword + ", " + condition + ", " + semicolon + ")";
+      return "Where(" + keyword + ", " + condition + ")";
     }
   }
   static class Without extends MovStmt {
-    Without(MovToken keyword, MovExpr condition, MovToken semicolon) {
+    Without(MovToken keyword, MovExpr condition) {
       this.keyword = keyword;
       this.condition = condition;
-      this.semicolon = semicolon;
     }
 
     @Override
@@ -141,185 +90,10 @@ abstract class MovStmt {
 
     final MovToken keyword;
     final MovExpr condition;
-    final MovToken semicolon;
 
     @Override
     public String toString() {
-      return "Without(" + keyword + ", " + condition + ", " + semicolon + ")";
-    }
-  }
-  static class Is extends MovStmt {
-    Is(MovToken keyword, MovExpr condition, MovToken semicolon) {
-      this.keyword = keyword;
-      this.condition = condition;
-      this.semicolon = semicolon;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitIsMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovExpr condition;
-    final MovToken semicolon;
-
-    @Override
-    public String toString() {
-      return "Is(" + keyword + ", " + condition + ", " + semicolon + ")";
-    }
-  }
-  static class For extends MovStmt {
-    For(MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body) {
-      this.keyword = keyword;
-      this.name = name;
-      this.iterable = iterable;
-      this.body = body;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitForMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovToken name;
-    final MovExpr iterable;
-    final List<MovStmt> body;
-
-    @Override
-    public String toString() {
-      return "For(" + keyword + ", " + name + ", " + iterable + ", " + body + ")";
-    }
-  }
-  static class In extends MovStmt {
-    In(MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body) {
-      this.keyword = keyword;
-      this.name = name;
-      this.iterable = iterable;
-      this.body = body;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitInMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovToken name;
-    final MovExpr iterable;
-    final List<MovStmt> body;
-
-    @Override
-    public String toString() {
-      return "In(" + keyword + ", " + name + ", " + iterable + ", " + body + ")";
-    }
-  }
-  static class Of extends MovStmt {
-    Of(MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body) {
-      this.keyword = keyword;
-      this.name = name;
-      this.iterable = iterable;
-      this.body = body;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitOfMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovToken name;
-    final MovExpr iterable;
-    final List<MovStmt> body;
-
-    @Override
-    public String toString() {
-      return "Of(" + keyword + ", " + name + ", " + iterable + ", " + body + ")";
-    }
-  }
-  static class With extends MovStmt {
-    With(MovToken keyword, MovToken name, MovExpr iterable, List<MovStmt> body) {
-      this.keyword = keyword;
-      this.name = name;
-      this.iterable = iterable;
-      this.body = body;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWithMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovToken name;
-    final MovExpr iterable;
-    final List<MovStmt> body;
-
-    @Override
-    public String toString() {
-      return "With(" + keyword + ", " + name + ", " + iterable + ", " + body + ")";
-    }
-  }
-  static class Starring extends MovStmt {
-    Starring(MovToken keyword, MovExpr expression, MovToken semicolon) {
-      this.keyword = keyword;
-      this.expression = expression;
-      this.semicolon = semicolon;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitStarringMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovExpr expression;
-    final MovToken semicolon;
-
-    @Override
-    public String toString() {
-      return "Starring(" + keyword + ", " + expression + ", " + semicolon + ")";
-    }
-  }
-  static class DirectedBy extends MovStmt {
-    DirectedBy(MovToken keyword, MovExpr expression, MovToken semicolon) {
-      this.keyword = keyword;
-      this.expression = expression;
-      this.semicolon = semicolon;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitDirectedByMovStmt(this);
-    }
-
-    final MovToken keyword;
-    final MovExpr expression;
-    final MovToken semicolon;
-
-    @Override
-    public String toString() {
-      return "DirectedBy(" + keyword + ", " + expression + ", " + semicolon + ")";
-    }
-  }
-  static class Kind extends MovStmt {
-    Kind(MovToken kind, MovToken name) {
-      this.kind = kind;
-      this.name = name;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitKindMovStmt(this);
-    }
-
-    final MovToken kind;
-    final MovToken name;
-
-    @Override
-    public String toString() {
-      return "Kind(" + kind + ", " + name + ")";
+      return "Without(" + keyword + ", " + condition + ")";
     }
   }
 

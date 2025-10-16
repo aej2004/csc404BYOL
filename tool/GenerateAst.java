@@ -14,14 +14,13 @@ public class GenerateAst {
         String outputDir = args[0];
 
         defineAst(outputDir, "MovExpr", Arrays.asList(
-                "Kind   : MovToken name"
+                "Have       : MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression",
+                "Say        : MovToken keyword, MovToken literal1, MovToken kind, MovToken literal2"
         ));
 
         defineAst(outputDir, "MovStmt", Arrays.asList(
-                "Find       : MovToken keyword, MovToken kind, MovToken keyword, MovToken literal",
-                "Have       : MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression",
-                "Say        : MovToken keyword, MovToken literal, MovToken kind, MovToken literal",
-                "Write      : MovToken keyword, MovToken kind, MovToken keyword, MovToken literal",
+                "Find       : MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal",
+                "Write      : MovToken keyword1, MovToken kind, MovToken keyword2, MovToken literal",
                 "Where     : MovToken keyword, MovExpr condition",
                 "Without   : MovToken keyword, MovExpr condition"
         ));

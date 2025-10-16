@@ -38,11 +38,48 @@ public class MovParser {
         }
     }
 
+    private MovStmt kindDeclaration() {
+        MovToken name = consume(IDENTIFIER, "Expect kind name.");
+        
+        MovExpr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+    }
+
+    private void synchronize() {
+        advance();
+
+        /* 
+        figure out what is the determining factor for the end of a statement
+
+        while (!isAtEnd()) {
+            if (previous().type == ) return;
+        */
+
+            switch (peek().type) {
+                case FIND:
+                case HAVE:
+                case SAY:
+                case WRITE:
+                case WHERE:
+                case WITHOUT:
+                case KIND:
+                    return;
+            }
+
+            advance();
+        /* } */
+    }
+
     private MovStmt statement() {
         if (match(FIND)) return findStatement();
         if (match(HAVE)) return haveStatement();
         if (match(SAY)) return sayStatement();
         if (match(WRITE)) return writeStatement();
+        if (match(WHERE)) return whereStatement();
+        if (match(WITHOUT)) return withoutStatement();
         throw error(peek(), "Expect statement.");
     }
 
