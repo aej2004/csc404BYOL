@@ -12,15 +12,17 @@
 ## Grammar: 
 
 ```
-findStmt -> "find" kind ("starring" | "directed by" | "for" | "in" | "of") str (where | without. <condition>)?
+findStmt -> "find" kind query str (where | without. <condition>)
 
 haveStmt -> "have" ... = <findStmt>
 
 sayStmt -> "say" str (rating | summary) (num | str)
 
-writeStmt -> "write" kind ("starring" | "directed by" | "for" | "in" | "of") str (where | without. <condition>)?
+writeStmt -> "write" kind query str (where | without. <condition>)
 
-kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director" | ?age-appropriate
+kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director" | age-appropriate
+
+query -> "starring" | "directed by" | "for" | "in" | "of"
 
 condition -> str | kind "is" str | <conditon> > <condition>
 ```
