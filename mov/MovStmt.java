@@ -7,101 +7,97 @@ import java.util.List;
 
 abstract class MovStmt {
   interface Visitor<R> {
-    R visitFindMovStmt(Find movstmt);
-    R visitWriteMovStmt(Write movstmt);
-    R visitHaveMovStmt(Have movstmt);
-    R visitSayMovStmt(Say movstmt);
+    R visitFindSMovStmt(FindS movstmt);
+    R visitHaveSMovStmt(HaveS movstmt);
+    R visitSaySMovStmt(SayS movstmt);
+    R visitWriteSMovStmt(WriteS movstmt);
   }
-  static class Find extends MovStmt {
-    Find(MovToken keyword, MovToken kind, MovToken descriptor, MovToken literal) {
-      this.keyword = keyword;
+  static class FindS extends MovStmt {
+    FindS(Kind kind, Query query, MovToken identifier, Condition condition) {
       this.kind = kind;
-      this.descriptor = descriptor;
-      this.literal = literal;
+      this.query = query;
+      this.identifier = identifier;
+      this.condition = condition;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitFindMovStmt(this);
+      return visitor.visitFindSMovStmt(this);
     }
 
-    final MovToken keyword;
-    final MovToken kind;
-    final MovToken descriptor;
-    final MovToken literal;
+    final Kind kind;
+    final Query query;
+    final MovToken identifier;
+    final Condition condition;
 
     @Override
     public String toString() {
-      return "Find(" + keyword + ", " + kind + ", " + descriptor + ", " + literal + ")";
+      return "FindS(" + kind + ", " + query + ", " + identifier + ", " + condition + ")";
     }
   }
-  static class Write extends MovStmt {
-    Write(MovToken keyword, MovToken kind, MovToken descriptor, MovToken literal) {
-      this.keyword = keyword;
+  static class HaveS extends MovStmt {
+    HaveS(Kind kind, MovToken identifier, Condition condition) {
       this.kind = kind;
-      this.descriptor = descriptor;
-      this.literal = literal;
+      this.identifier = identifier;
+      this.condition = condition;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWriteMovStmt(this);
+      return visitor.visitHaveSMovStmt(this);
     }
 
-    final MovToken keyword;
-    final MovToken kind;
-    final MovToken descriptor;
-    final MovToken literal;
+    final Kind kind;
+    final MovToken identifier;
+    final Condition condition;
 
     @Override
     public String toString() {
-      return "Write(" + keyword + ", " + kind + ", " + descriptor + ", " + literal + ")";
+      return "HaveS(" + kind + ", " + identifier + ", " + condition + ")";
     }
   }
-  static class Have extends MovStmt {
-    Have(MovToken keyword, MovToken literal, MovToken symbol, MovExpr expression) {
-      this.keyword = keyword;
-      this.literal = literal;
-      this.symbol = symbol;
-      this.expression = expression;
+  static class SayS extends MovStmt {
+    SayS(MovToken identifier, MovToken ratsum, MovToken numstr) {
+      this.identifier = identifier;
+      this.ratsum = ratsum;
+      this.numstr = numstr;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitHaveMovStmt(this);
+      return visitor.visitSaySMovStmt(this);
     }
 
-    final MovToken keyword;
-    final MovToken literal;
-    final MovToken symbol;
-    final MovExpr expression;
+    final MovToken identifier;
+    final MovToken ratsum;
+    final MovToken numstr;
 
     @Override
     public String toString() {
-      return "Have(" + keyword + ", " + literal + ", " + symbol + ", " + expression + ")";
+      return "SayS(" + identifier + ", " + ratsum + ", " + numstr + ")";
     }
   }
-  static class Say extends MovStmt {
-    Say(MovToken keyword, MovToken literal1, MovToken kind, MovToken literal2) {
-      this.keyword = keyword;
-      this.literal1 = literal1;
+  static class WriteS extends MovStmt {
+    WriteS(Kind kind, Query query, MovToken identifier, Condition condition) {
       this.kind = kind;
-      this.literal2 = literal2;
+      this.query = query;
+      this.identifier = identifier;
+      this.condition = condition;
     }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitSayMovStmt(this);
+      return visitor.visitWriteSMovStmt(this);
     }
 
-    final MovToken keyword;
-    final MovToken literal1;
-    final MovToken kind;
-    final MovToken literal2;
+    final Kind kind;
+    final Query query;
+    final MovToken identifier;
+    final Condition condition;
 
     @Override
     public String toString() {
-      return "Say(" + keyword + ", " + literal1 + ", " + kind + ", " + literal2 + ")";
+      return "WriteS(" + kind + ", " + query + ", " + identifier + ", " + condition + ")";
     }
   }
 

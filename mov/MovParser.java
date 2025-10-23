@@ -30,41 +30,10 @@ public class MovParser {
 
     private MovExpr assignment() {
 
-        if(match(EQUAL)) {
-
-            MovToken keyword = previous();
-            MovToken literal = consume(STRING, "Expect literal after 'have'.");
-            MovToken symbol = consume(EQUAL, "Expect symbol after literal.");
-            MovExpr expression = null;
-
-            if (match(EQUAL)) {
-                expression = expression();
-            }
-
-            return new MovExpr.Have(keyword, literal, symbol, expression);
-
-        } else if (match(SAY)) {
-
-            MovToken keyword = peek();
-            MovToken literal1 = consume(STRING, "Expect literal after 'say'.");
-            MovToken kind = consume(KIND, "Expect 'kind' after literal.");
-            MovToken literal2 = consume(LITERAL, "Expect literal after 'kind'.");
-
-            return new MovExpr.Say(keyword, literal1, kind, literal2);
-
-        }
-
     }
 
     private MovStmt declaration() {
-        try {
-            if (match(HAVE)) return haveDeclaration();
-            if (match(SAY)) return sayDeclaration();
-            return statement();
-        } catch (ParseError error) {
-            synchronize();
-            return null;
-        }
+
     }
 
     private MovStmt haveDeclaration() {
@@ -114,17 +83,16 @@ public class MovParser {
 
     private MovStmt statement() {
         if (match(FIND)) return findStatement();
+        if (match(HAVE)) return haveStatment();
+        if (match(SAY)) return sayStatement();
         if (match(WRITE)) return writeStatement();
         throw error(peek(), "Expect statement.");
     }
 
     private MovStmt findStatement() {
-        MovToken keyword = previous();
-        MovToken kind = consume(KIND, "Expect 'kind' after 'find'.");
-        MovToken descriptor = consume(DESCRIPT, "Expect 'where' after 'kind'.");
-        MovToken literal = consume(STRING, "Expect literal after 'where'.");
+        MovToken kind = previous();
 
-        return new MovStmt.Find(keyword, kind, descriptor, literal);
+        return new MovStmt.FindS(kind, query, identifier, condition);
     }
 
     private MovStmt writeStatement() {

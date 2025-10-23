@@ -3,9 +3,9 @@ package mov;
 enum  MovTokenType {
 
     // Types 
-    KIND, KEYWORD, DESCRIPT, LITERAL,
+    KIND, QUERY, CONDITION, KEYWORD, DESCRIPT, LITERAL,
     
-    // Descriptors
+    // Query
     IS, FOR, IN, OF, WITH, STARRING, DIRECTED_BY,
 
     // Keyword 

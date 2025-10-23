@@ -13,18 +13,18 @@ public class GenerateAst {
         }
         String outputDir = args[0];
 
-        defineAst(outputDir, "MovExpr", Arrays.asList(
-
-        ));
-
         defineAst(outputDir, "MovStmt", Arrays.asList(
-            "Find : Kind kind, Query query, Identifier identifier, Condition condition",
-            "Have : ",
-            "Say : Identifier identifier, ",
+            "FindS : Kind kind, Query query, MovToken identifier, Condition condition",
+            "HaveS : Kind kind, MovToken identifier, Condition condition",
+            "SayS : MovToken identifier, MovToken ratsum, MovToken numstr",
+            "WriteS : Kind kind, Query query, MovToken identifier, Condition condition"
         ));
 
         defineAst(outputDir, "MovCond", Arrays.asList(
-
+            "NegC : Condition condition",
+            "StrC : String str",
+            "KindC : Kind kind, String str",
+            "LtC : Condition left, Condition right, MovToken operator"
         ));
     }
 
