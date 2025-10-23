@@ -22,9 +22,9 @@ writeStmt -> "write" kind query str (where | without. <condition>)
 
 kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director" | age-appropriate
 
-query -> "starring" | "directed by" | "for" | "in" | "of"
+query -> "starring" | "directed by" | "for" | "in" | "of" | "is"
 
-condition -> str | kind "is" str | <conditon> > <condition>
+condition -> str | kind query str | <conditon> > <condition>
 ```
 
 ## Examples: 
