@@ -104,7 +104,7 @@ outputs all the stars that are in both movies
 
 ```
 find movies with "tom hanks" where genre is "action"
-find stars in "The Lion King" where movie is "The Little Mermaid"
+find stars in "The Lion King" where movies is "The Little Mermaid"
 ```
 
 <p>Outputs:</p>
