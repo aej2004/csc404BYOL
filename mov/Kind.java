@@ -1,8 +1,8 @@
 package mov;
 
 enum Kind {
-    MOVIE, 
-    RATING, 
+    MOVIES, 
+    RATINGS, 
     GENRE, 
     STARS, 
     YEAR,

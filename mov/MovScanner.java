@@ -83,7 +83,21 @@ public class MovScanner {
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
 
-        String text = source.substring(start, current);
+        String text = source.substring(start, current); 
+
+        // Check for "directed by" as a single token
+        if (text.equals("directed") && peek() == ' ') {
+            int tempStart = current; // Save the current position
+            advance(); // Consume the space
+            if (source.substring(current, Math.min(current + 2, source.length())).equals("by")) {
+                advance(); // Consume 'b'
+                advance(); // Consume 'y'
+                text = "directed_by"; // Combine into a single token
+            } else {
+                current = tempStart; // Revert if not "by"
+            }
+        }
+
         MovTokenType type = keywords.get(text);
         if (type == null) type = IDENTIFIER;
         addToken(type);

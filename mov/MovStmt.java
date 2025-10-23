@@ -13,7 +13,7 @@ abstract class MovStmt {
     R visitWriteSMovStmt(WriteS movstmt);
   }
   static class FindS extends MovStmt {
-    FindS(Kind kind, Query query, MovToken identifier, Condition condition) {
+    FindS(Kind kind, Query query, MovToken identifier, MovCond condition) {
       this.kind = kind;
       this.query = query;
       this.identifier = identifier;
@@ -28,7 +28,7 @@ abstract class MovStmt {
     final Kind kind;
     final Query query;
     final MovToken identifier;
-    final Condition condition;
+    final MovCond condition;
 
     @Override
     public String toString() {
@@ -36,7 +36,7 @@ abstract class MovStmt {
     }
   }
   static class HaveS extends MovStmt {
-    HaveS(Kind kind, MovToken identifier, Condition condition) {
+    HaveS(Kind kind, MovToken identifier, MovCond condition) {
       this.kind = kind;
       this.identifier = identifier;
       this.condition = condition;
@@ -49,7 +49,7 @@ abstract class MovStmt {
 
     final Kind kind;
     final MovToken identifier;
-    final Condition condition;
+    final MovCond condition;
 
     @Override
     public String toString() {
@@ -57,7 +57,7 @@ abstract class MovStmt {
     }
   }
   static class SayS extends MovStmt {
-    SayS(MovToken identifier, MovToken ratsum, MovToken numstr) {
+    SayS(MovToken identifier, Kind ratsum, MovToken numstr) {
       this.identifier = identifier;
       this.ratsum = ratsum;
       this.numstr = numstr;
@@ -69,7 +69,7 @@ abstract class MovStmt {
     }
 
     final MovToken identifier;
-    final MovToken ratsum;
+    final Kind ratsum;
     final MovToken numstr;
 
     @Override
@@ -78,7 +78,7 @@ abstract class MovStmt {
     }
   }
   static class WriteS extends MovStmt {
-    WriteS(Kind kind, Query query, MovToken identifier, Condition condition) {
+    WriteS(Kind kind, Query query, MovToken identifier, MovCond condition) {
       this.kind = kind;
       this.query = query;
       this.identifier = identifier;
@@ -93,7 +93,7 @@ abstract class MovStmt {
     final Kind kind;
     final Query query;
     final MovToken identifier;
-    final Condition condition;
+    final MovCond condition;
 
     @Override
     public String toString() {

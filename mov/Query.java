@@ -2,8 +2,9 @@ package mov;
 
 enum Query {
     STARRING,
-    DIRECTED,
+    DIRECTED_BY,
     FOR,
     IN,
-    OF
+    OF,
+    IS
 }

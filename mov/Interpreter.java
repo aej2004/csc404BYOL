@@ -8,6 +8,8 @@ import mov.MovCond.KindC;
 import mov.MovCond.LtC;
 import mov.MovCond.NegC;
 import mov.MovCond.StrC;
+import mov.MovCond.WhereC;
+import mov.MovCond.WithoutC;
 import mov.MovStmt.FindS;
 import mov.MovStmt.HaveS;
 import mov.MovStmt.SayS;
@@ -121,6 +123,26 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     public Object visitWriteSMovStmt(WriteS movstmt) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visitWriteSMovStmt'");
+    }
+
+
+
+
+
+    @Override
+    public Void visitWhereCMovCond(WhereC movcond) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitWhereCMovCond'");
+    }
+
+
+
+
+
+    @Override
+    public Void visitWithoutCMovCond(WithoutC movcond) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitWithoutCMovCond'");
     }
     
 }

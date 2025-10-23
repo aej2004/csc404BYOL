@@ -2,6 +2,8 @@ package mov;
 
 enum Condition {
     
+    WHERE,
+    WITHOUT,
     EQUAL,
     NOT_EQUAL,
     LESS,

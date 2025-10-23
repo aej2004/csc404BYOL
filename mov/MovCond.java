@@ -11,6 +11,8 @@ abstract class MovCond {
     R visitStrCMovCond(StrC movcond);
     R visitKindCMovCond(KindC movcond);
     R visitLtCMovCond(LtC movcond);
+    R visitWhereCMovCond(WhereC movcond);
+    R visitWithoutCMovCond(WithoutC movcond);
   }
   static class NegC extends MovCond {
     NegC(Condition condition) {
@@ -84,6 +86,48 @@ abstract class MovCond {
     @Override
     public String toString() {
       return "LtC(" + left + ", " + right + ", " + operator + ")";
+    }
+  }
+  static class WhereC extends MovCond {
+    WhereC(Kind kind, Query query, MovToken identifier) {
+      this.kind = kind;
+      this.query = query;
+      this.identifier = identifier;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitWhereCMovCond(this);
+    }
+
+    final Kind kind;
+    final Query query;
+    final MovToken identifier;
+
+    @Override
+    public String toString() {
+      return "WhereC(" + kind + ", " + query + ", " + identifier + ")";
+    }
+  }
+  static class WithoutC extends MovCond {
+    WithoutC(Kind kind, Query query, MovToken identifier) {
+      this.kind = kind;
+      this.query = query;
+      this.identifier = identifier;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitWithoutCMovCond(this);
+    }
+
+    final Kind kind;
+    final Query query;
+    final MovToken identifier;
+
+    @Override
+    public String toString() {
+      return "WithoutC(" + kind + ", " + query + ", " + identifier + ")";
     }
   }
 
