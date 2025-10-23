@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MovTest {
     public static void main(String[] args) {
-        String filePath = "mov/sample.mov"; // Adjust the path if necessary
+        String filePath = "mov/sample2.mov"; // Adjust the path if necessary
 
         try {
             // Read the content of sample.mov
@@ -23,6 +23,20 @@ public class MovTest {
             for (MovToken token : tokens) {
                 System.out.println(token);
             }
+
+            MovParser mp = new MovParser(tokens);
+            List<MovStmt> statements = mp.parse();
+
+            for (MovStmt stmt : statements) {
+                System.out.println(stmt);
+            }
+
+            // find movies starring "Tom Hanks"
+            //System.out.println(new MovStmt.FindS(Kind.MOVIE, Query.STARRING, new MovToken(MovTokenType.STRING, "Tom Hanks", "Tom Hanks", 1), null ));
+
+            Interpreter interpreter = new Interpreter();
+            interpreter.interpret(statements);
+
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
