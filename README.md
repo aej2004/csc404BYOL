@@ -12,17 +12,19 @@
 ## Grammar: 
 
 ```
-findStmt -> "find" kind ("starring" | "directed by" | "for" | "in" | "of") str (where | without. <condition>)?
+findStmt -> "find" kind query str (where | without. <condition>)
 
 haveStmt -> "have" ... = <findStmt>
 
 sayStmt -> "say" str (rating | summary) (num | str)
 
-writeStmt -> "write" kind ("starring" | "directed by" | "for" | "in" | "of") str (where | without. <condition>)?
+writeStmt -> "write" kind query str (where | without. <condition>)
 
-kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director" | ?age-appropriate
+kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director" | age-appropriate
 
-condition -> str | kind "is" str | <conditon> > <condition>
+query -> "starring" | "directed by" | "for" | "in" | "of" | "is"
+
+condition -> str | kind query str | <conditon> > <condition>
 ```
 
 ## Examples: 
@@ -102,7 +104,7 @@ outputs all the stars that are in both movies
 
 ```
 find movies with "tom hanks" where genre is "action"
-find stars in "The Lion King" where movie is "The Little Mermaid"
+find stars in "The Lion King" where movies is "The Little Mermaid"
 ```
 
 <p>Outputs:</p>
