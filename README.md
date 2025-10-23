@@ -65,8 +65,8 @@ Stores the string, list of strings, or double under the given variables name.
 ### Example Program 3 Setter
 
 ```
-say "Sing 2" rating 9.5
-find rating for "Tori Kelly"
+say "Sing 2" ratings 9.5
+find ratings for "Tori Kelly"
 ```
 
 <p>Outputs:</p>
