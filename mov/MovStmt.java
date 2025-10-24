@@ -36,10 +36,9 @@ abstract class MovStmt {
     }
   }
   static class HaveS extends MovStmt {
-    HaveS(Kind kind, MovToken identifier, MovCond condition) {
-      this.kind = kind;
+    HaveS(MovToken identifier, MovStmt statement) {
       this.identifier = identifier;
-      this.condition = condition;
+      this.statement = statement;
     }
 
     @Override
@@ -47,13 +46,12 @@ abstract class MovStmt {
       return visitor.visitHaveSMovStmt(this);
     }
 
-    final Kind kind;
     final MovToken identifier;
-    final MovCond condition;
+    final MovStmt statement;
 
     @Override
     public String toString() {
-      return "HaveS(" + kind + ", " + identifier + ", " + condition + ")";
+      return "HaveS(" + identifier + ", " + statement + ")";
     }
   }
   static class SayS extends MovStmt {

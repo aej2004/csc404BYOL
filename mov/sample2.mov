@@ -1,1 +1,1 @@
-say "Sing 2" ratings 9.5
+have tomMovies = find movies starring "tom hanks"

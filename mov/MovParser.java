@@ -111,11 +111,11 @@ public class MovParser {
     }
 
     private MovStmt haveStatment() {
-        Kind kind;
-        MovToken identifier;
-        Condition condition;
-        return null;
-        //return new MovStmt.HaveS(kind, identifier, condition);
+        MovToken identifier = advance();
+        advance(); // consume the '='
+        MovStmt statement = statement();
+
+        return new MovStmt.HaveS(identifier, statement);
     }
 
     private MovStmt sayStatement() {
