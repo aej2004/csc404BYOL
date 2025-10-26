@@ -22,11 +22,9 @@ public class GenerateAst {
 
         defineAst(outputDir, "MovCond", Arrays.asList(
             "NegC : Condition condition",
-            "StrC : String str",
-            "KindC : Kind kind, String str",
-            "LtC : Condition left, Condition right, MovToken operator",
-            "WhereC : Kind kind, Query query, MovToken identifier",
-            "WithoutC : Kind kind, Query query, MovToken identifier"
+            "StrC : String str, Kind kind",
+            "KindC : Kind kind, Query query, String str",
+            "LtC : Condition left, Condition right, MovToken operator"
         ));
     }
 

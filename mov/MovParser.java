@@ -157,6 +157,13 @@ public class MovParser {
         }
     }
 
+    private boolean isKind() {
+        String kind = peek().lexeme;
+        return kind.equals("movies") || kind.equals("ratings") || kind.equals("genre") 
+                || kind.equals("stars") || kind.equals("year") || kind.equals("summary") 
+                || kind.equals("length") || kind.equals("director");
+    }
+
     private Query query() {
         if (match(MovTokenType.STARRING)) {
             return Query.STARRING;
@@ -177,12 +184,35 @@ public class MovParser {
 
     private MovCond condition() {
         if (match(MovTokenType.WHERE)) {
-            Kind kind = kind();
-            Query query = query();
-            MovToken identifier = advance();
-            return new MovCond.WhereC(kind, query, identifier);
+            return whereCondition();
+        } else if (match(MovTokenType.WITHOUT)) {
+            return withoutCondition();
         } else {
             return null; // no condition
+        }
+    }
+
+    public MovCond whereCondition() {
+        if (isKind()) {
+            Kind kind = kind();
+            Query query = query();
+            String str = advance().lexeme;
+            return new MovCond.KindC(kind, query, str);
+        } else {
+            System.out.println("Expected where conditon");
+            return null; // no condition after WHERE
+        }
+    }
+
+    public MovCond withoutCondition() {
+        advance(); // consume the 'WITHOUT' token
+
+        if (match(MovTokenType.STRING)) {
+            String str = previous().lexeme;
+            Kind kind = kind();
+            return new MovCond.StrC(str, kind);
+        } else {
+            return null; // no condition after WITHOUT
         }
     }
 

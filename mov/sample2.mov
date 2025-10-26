@@ -1,1 +1,1 @@
-have tomMovies = find movies starring "tom hanks"
+find stars in "The Lion King" without "The Little Mermaid" movies

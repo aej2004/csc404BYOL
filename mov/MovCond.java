@@ -11,8 +11,6 @@ abstract class MovCond {
     R visitStrCMovCond(StrC movcond);
     R visitKindCMovCond(KindC movcond);
     R visitLtCMovCond(LtC movcond);
-    R visitWhereCMovCond(WhereC movcond);
-    R visitWithoutCMovCond(WithoutC movcond);
   }
   static class NegC extends MovCond {
     NegC(Condition condition) {
@@ -32,8 +30,9 @@ abstract class MovCond {
     }
   }
   static class StrC extends MovCond {
-    StrC(String str) {
+    StrC(String str, Kind kind) {
       this.str = str;
+      this.kind = kind;
     }
 
     @Override
@@ -42,15 +41,17 @@ abstract class MovCond {
     }
 
     final String str;
+    final Kind kind;
 
     @Override
     public String toString() {
-      return "StrC(" + str + ")";
+      return "StrC(" + str + ", " + kind + ")";
     }
   }
   static class KindC extends MovCond {
-    KindC(Kind kind, String str) {
+    KindC(Kind kind, Query query, String str) {
       this.kind = kind;
+      this.query = query;
       this.str = str;
     }
 
@@ -60,11 +61,12 @@ abstract class MovCond {
     }
 
     final Kind kind;
+    final Query query;
     final String str;
 
     @Override
     public String toString() {
-      return "KindC(" + kind + ", " + str + ")";
+      return "KindC(" + kind + ", " + query + ", " + str + ")";
     }
   }
   static class LtC extends MovCond {
@@ -86,48 +88,6 @@ abstract class MovCond {
     @Override
     public String toString() {
       return "LtC(" + left + ", " + right + ", " + operator + ")";
-    }
-  }
-  static class WhereC extends MovCond {
-    WhereC(Kind kind, Query query, MovToken identifier) {
-      this.kind = kind;
-      this.query = query;
-      this.identifier = identifier;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWhereCMovCond(this);
-    }
-
-    final Kind kind;
-    final Query query;
-    final MovToken identifier;
-
-    @Override
-    public String toString() {
-      return "WhereC(" + kind + ", " + query + ", " + identifier + ")";
-    }
-  }
-  static class WithoutC extends MovCond {
-    WithoutC(Kind kind, Query query, MovToken identifier) {
-      this.kind = kind;
-      this.query = query;
-      this.identifier = identifier;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWithoutCMovCond(this);
-    }
-
-    final Kind kind;
-    final Query query;
-    final MovToken identifier;
-
-    @Override
-    public String toString() {
-      return "WithoutC(" + kind + ", " + query + ", " + identifier + ")";
     }
   }
 
