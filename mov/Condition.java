@@ -10,5 +10,4 @@ enum Condition {
     LESS_EQUAL,
     GREATER,
     GREATER_EQUAL
-
 }

@@ -1,7 +1,6 @@
 package mov;
 
 import java.util.List;
-
 import static mov.MovTokenType.*;
 
 public class MovParser {
@@ -120,7 +119,7 @@ public class MovParser {
 
     private MovStmt sayStatement() {
         MovToken identifier = advance();
-        Kind ratsum = ratsum();
+        MovToken ratsum = ratsum();
         MovToken numstr = numstr();
         
         return new MovStmt.SayS(identifier, ratsum, numstr);
@@ -183,9 +182,17 @@ public class MovParser {
     }
 
     private MovCond condition() {
-        if (match(MovTokenType.WHERE)) {
+        if (match(MovTokenType.NOT)) {
+            return negCondition(); 
+        } if (match(MovTokenType.STRC)) {
+            return strCondition();
+        } if (match(MovTokenType.KINDC)) {
+            return kindCondition();
+        } if (match(MovTokenType.LESS, MovTokenType.LESS_EQUAL, MovTokenType.GREATER, MovTokenType.GREATER_EQUAL)) {
+            return ltCondition();
+        }if (match(MovTokenType.WHERE)) {
             return whereCondition();
-        } else if (match(MovTokenType.WITHOUT)) {
+        } if (match(MovTokenType.WITHOUT)) {
             return withoutCondition();
         } else {
             return null; // no condition
@@ -216,13 +223,39 @@ public class MovParser {
         }
     }
 
-    private Kind ratsum() {
+    private MovCond negCondition() {
+        MovToken notToken = previous(); // NOT token
+        MovCond condition = condition(); // parse inner condition
+        return new MovCond.NegC(condition);
+    }
+    private MovCond strCondition() {
+        MovToken strToken = advance(); // STRING token
+        String str = strToken.lexeme;
+        Kind kind = kind();
+        return new MovCond.StrC(str, kind);
+    }
+    private MovCond kindCondition() {
+        Kind kind = kind();
+        Query query = query();
+        String str = advance().lexeme;
+        return new MovCond.KindC(kind, query, str);
+    }
+    private MovCond ltCondition() {
+        MovToken operator = previous(); // LESS, LESS_EQUAL, GREATER, GREATER_EQUAL token
+        MovCond left = condition(); 
+        MovCond right = condition(); 
+        return new MovCond.LtC(left, right, operator);
+    }
+
+
+
+    private MovToken ratsum() {
         if (match(MovTokenType.RATINGS)) {
-            return Kind.RATINGS;
+            return previous();
         } else if (match(MovTokenType.SUMMARY)) {
-            return Kind.SUMMARY;
+            return previous();
         } else {
-            throw error(peek(), "Expect ratsum.");
+            throw error(peek(), "Expect Rating or Summary.");
         }
     }
 
