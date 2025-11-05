@@ -32,75 +32,8 @@ public class MovParser {
         throw error(peek(), "Expect statement.");
     }
 
-
-    /*
-    private MovCond declaration() {
-        try {
-            if (match(NEGC)) return negCondition();
-            if (match(STRC)) return strCondition();
-            if (match(KINDC)) return kindCondition();
-            if (match(LTC)) return ltCondition();
-            return condition();
-        } catch (ParseError error) {
-            synchronize();
-            return null;
-        }
-    }
-
-    private MovCond negCondition() {
-        Condition condition;
-
-        return new MovCond.NegC(condition);
-    }
-
-    private MovCond strCondition() {
-        String str;
-
-        return new MovCond.StrC(str);
-    }
-
-    private MovCond kindCondition() {
-        Kind kind;
-        String str;
-
-        return new MovCond.KindC(kind, str);
-    }
-
-    private MovCond ltCondition() {
-        Condition left;
-        Condition right;
-        MovToken operator;
-
-        return new MovCond.LtC(left, right, operator);
-    }
-        */
-
-        /*
-    private void synchronize() {
-        advance();
-
-        /* 
-        figure out what is the determining factor for the end of a statement
-
-        while (!isAtEnd()) {
-            if (previous().type == ) return;
-        
-
-            switch (peek().type) {
-                case FIND:
-                case WRITE:
-                case WHERE:
-                case WITHOUT:
-                case KIND:
-                    return;
-            }
-
-            advance();
-        /* } 
-    }*/
-
-
     private MovStmt findStatement() {
+        System.out.println("in findStatement");
         Kind kind = kind();
         Query query = query();
         MovToken obj = advance();
@@ -182,6 +115,7 @@ public class MovParser {
     }
 
     private MovCond condition() {
+        System.out.println("in condition");
         if (match(MovTokenType.NOT)) {
             return negCondition(); 
         } if (match(MovTokenType.STRC)) {
@@ -212,8 +146,7 @@ public class MovParser {
     }
 
     public MovCond withoutCondition() {
-        advance(); // consume the 'WITHOUT' token
-
+        System.out.println(peek().type);
         if (match(MovTokenType.STRING)) {
             String str = previous().lexeme;
             Kind kind = kind();
