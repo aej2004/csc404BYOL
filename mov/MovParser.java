@@ -157,7 +157,6 @@ public class MovParser {
     }
 
     private MovCond negCondition() {
-        MovToken notToken = previous(); // NOT token
         MovCond condition = condition(); // parse inner condition
         return new MovCond.NegC(condition);
     }

@@ -31,11 +31,8 @@ public class MovTest {
                 System.out.println(stmt);
             }
 
-            // find movies starring "Tom Hanks"
-            //System.out.println(new MovStmt.FindS(Kind.MOVIE, Query.STARRING, new MovToken(MovTokenType.STRING, "Tom Hanks", "Tom Hanks", 1), null ));
-
-            //Interpreter interpreter = new Interpreter();
-            //interpreter.interpret(statements);
+            Interpreter interpreter = new Interpreter();
+            interpreter.interpret(statements);
 
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
