@@ -189,6 +189,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 + " with condition " + movstmt.condition);
 
         if(movstmt.kind == Kind.MOVIES) {
+            List<String> movies = new ArrayList<>();
             List<Movie> foundMovie = new ArrayList<>();
 
             switch(movstmt.query) {
@@ -197,13 +198,29 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
                     for (int i = 0; i < allMoviesDB.length; i++) {
                         for (int j = 0; j < allMoviesDB[i].size(); j++) {
-                            System.out.println("Checking movie: " + allMoviesDB[i].get(j));
                             if (allMoviesDB[i].get(i).stars.contains(movstmt.identifier.lexeme)) {
                                 foundMovie.add(allMoviesDB[i].get(i));
                             }
                         }
                     }
                     break;
+                
+                case DIRECTED_BY:
+
+                    List<String> directors = new ArrayList<>();
+                    
+                    //for (int i = 0; i < allMoviesDB.length; i++) {
+                        for (int j = 0; j < actionDB.size(); j++) {
+                            directors.add(actionDB.get(j).director);
+                            for (String d : directors) {
+                                if (d.contains(movstmt.identifier.lexeme)) {
+                                    foundMovie.add(actionDB.get(j));
+                                }
+                            }
+                        }
+                        System.out.println("Found movies: " + foundMovie);
+                        return foundMovie;
+                    //}
 
             }
             
