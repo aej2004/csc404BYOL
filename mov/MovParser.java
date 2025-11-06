@@ -128,9 +128,12 @@ public class MovParser {
             return whereCondition();
         } if (match(MovTokenType.WITHOUT)) {
             return withoutCondition();
-        } else {
-            return null; // no condition
+        } if (match(MovTokenType.AND)) {
+            return andCondition();
+        } if (match(MovTokenType.OR)) {
+            return orConditon();
         }
+            return null; // no condition
     }
 
     public MovCond whereCondition() {
@@ -178,6 +181,21 @@ public class MovParser {
         MovCond right = condition(); 
         return new MovCond.LtC(left, right, operator);
     }
+
+    private MovCond andCondition(){
+        MovCond left = condition(); 
+        MovCond right = condition(); 
+        MovToken operator = new MovToken(MovTokenType.AND, "and",null,0);
+        return new MovCond.AndC(condition(), condition());
+    }
+
+    private MovCond orConditon(){
+        MovCond left = condition();
+        MovCond right = condition();
+        MovToken operator = new MovToken(MovTokenType.OR, "or",null,0);
+        return new MovCond.OrC(condition(), condition());
+    }
+
 
 
 

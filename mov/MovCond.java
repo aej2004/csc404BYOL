@@ -9,6 +9,8 @@ abstract class MovCond{
     R visitStrCMovCond(StrC movcond);
     R visitKindCMovCond(KindC movcond);
     R visitLtCMovCond(LtC movcond);
+    R visitAndCMovCond(AndC movcond);
+    R visitOrCMovCond(OrC movcond);
   }
   static class NegC extends MovCond {
     NegC(MovCond condition) {
@@ -83,6 +85,46 @@ abstract class MovCond{
     @Override
     public String toString() {
       return "LtC(" + left + ", " + right + ", " + operator + ")";
+    }
+  }
+
+  static class AndC extends MovCond {
+    final MovCond left;
+    final MovCond right;
+
+    AndC(MovCond left, MovCond right) {
+      this.left = left;
+      this.right = right;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitAndCMovCond(this);
+    }
+
+    @Override
+    public String toString() {
+      return "AndC(" + left + ", " + right + ")";
+    }
+  }
+
+  static class OrC extends MovCond {
+    final MovCond left;
+    final MovCond right;
+
+    OrC(MovCond left, MovCond right) {
+      this.left = left;
+      this.right = right;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitOrCMovCond(this);
+    }
+
+    @Override
+    public String toString() {
+      return "OrC(" + left + ", " + right + ")";
     }
   }
 
