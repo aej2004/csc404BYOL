@@ -9,9 +9,11 @@ import java.util.List;
 
 import javax.xml.crypto.Data;
 
+import mov.MovCond.AndC;
 import mov.MovCond.KindC;
 import mov.MovCond.LtC;
 import mov.MovCond.NegC;
+import mov.MovCond.OrC;
 import mov.MovCond.StrC;
 import mov.MovStmt.FindS;
 import mov.MovStmt.HaveS;
@@ -23,7 +25,7 @@ class Movie {
     int year;
     String certificate;
     String genre;
-    int rating;
+    double rating;
     String description;
     String director;
     String stars;
@@ -178,113 +180,143 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
         System.out.println(allMoviesDB.size());
 
-        if(movstmt.kind == Kind.MOVIES) {
+        switch (movstmt.kind) {
 
-            switch(movstmt.query) {
+            case MOVIES:
 
-                case STARRING:
+                switch (movstmt.query) {
 
-                    for (Movie m : allMoviesDB) {
-                        if(m.stars.contains(search)) {
-                            foundMovie.add(m);
+                    case STARRING:
+
+                        for (Movie m : allMoviesDB) {
+                            if(m.stars.contains(search)) {
+                                foundMovie.add(m);
+                            }
                         }
-                    }
-                    break;
-                
-                case DIRECTED_BY:
+                        break;
+                    
+                    case DIRECTED_BY:
 
-                    for (Movie m : allMoviesDB) {
-                        if(m.director.contains(search)) {
-                            foundMovie.add(m);
+                        for (Movie m : allMoviesDB) {
+                            if(m.director.contains(search)) {
+                                foundMovie.add(m);
+                            }
                         }
-                    }
-                    break;
+                        break;
 
-            }
+                }
             
-            System.out.println("Found movies: " + foundMovie);
-            return foundMovie;
-        } else if (movstmt.kind == Kind.GENRE) {
+                System.out.println("Found movies: " + foundMovie);
+                return foundMovie;
 
-            String genre = "";
+            // all of the movie are being loaded in with the rating of zero
+            case RATINGS:
 
-            switch(movstmt.query) {
+                double rating = -1; 
 
-                case FOR:
+                switch (movstmt.query) {
 
-                    for(Movie m : allMoviesDB) {
-                        if(m.stars.contains(search)) {
-                            foundMovie.add(m);
-                        }
-                    }
+                    case FOR:
 
-                    for (Movie m : foundMovie) {
-                        
-                        if (!(genre.contains(m.genre))) {
-                            genre += m.genre;
+                        for(Movie m : allMoviesDB) {
+                            if (m.movie_name.equals(search)){
+                                foundMovie.add(m);
+                            }
                         }
 
-                    }
-
-                    break;
-
-                case OF:
-
-                    for (Movie m : allMoviesDB) {
-                        if(m.movie_name.equals(search)) {
-                            foundMovie.add(m);
-                        }
-                    }
-
-                    for (Movie m : foundMovie) {
-
-                        if (!(genre.equals(m.genre))) {
-                            genre += m.genre;
+                        for(Movie m : foundMovie) {
+                            rating = m.rating;
                         }
 
-                    }
+                        break;
 
-                    break;
+                }
 
-            }
+                System.out.println("Found movies: " + foundMovie);
+                System.out.println("Rating: " + rating);
+                return rating;
 
-            System.out.println("Genre: " + genre);
-            return genre;
+            case GENRE:
+
+                String genre = "";
+
+                switch(movstmt.query) {
+
+                    case FOR:
+
+                        for(Movie m : allMoviesDB) {
+                            if(m.stars.contains(search)) {
+                                foundMovie.add(m);
+                            }
+                        }
+
+                        for (Movie m : foundMovie) {
+                            
+                            if (!(genre.contains(m.genre))) {
+                                genre += m.genre;
+                            }
+
+                        }
+
+                        break;
+
+                    case OF:
+
+                        for (Movie m : allMoviesDB) {
+                            if(m.movie_name.equals(search)) {
+                                foundMovie.add(m);
+                            }
+                        }
+
+                        for (Movie m : foundMovie) {
+
+                            if (!(genre.equals(m.genre))) {
+                                genre += m.genre;
+                            }
+
+                        }
+
+                        break;
+
+                }
+
+                System.out.println("Genre: " + genre);
+                return genre;
             
-        } else if (movstmt.kind == Kind.STARS) {
+            case STARS: 
 
-            String stars = "";
+                String stars = "";
 
-            switch (movstmt.query) {
+                switch (movstmt.query) {
 
-                case IN:
+                    case IN:
 
-                    for (Movie m : allMoviesDB) {
+                        for (Movie m : allMoviesDB) {
 
-                        if (m.movie_name.contains(search)) {
-                            foundMovie.add(m);
+                            if (m.movie_name.contains(search)) {
+                                foundMovie.add(m);
+                            }
+
                         }
 
-                    }
+                        for (Movie m : foundMovie) {
 
-                    for (Movie m : foundMovie) {
+                            if (!(stars.contains(m.stars))) {
+                                stars += m.stars;
+                            }
 
-                        if (!(stars.contains(m.stars))) {
-                            stars += m.stars;
                         }
 
-                    }
+                        break;
 
-                    break;
+                }
 
-            }
+                System.out.println("Stars: " + stars);
+                return stars;
 
-            System.out.println("Stars: " + stars);
-            return stars;
+            default:
 
-        } else {
-
-            System.out.println("Unknown kind: " + movstmt.kind);
+                System.out.println("Unknown kind: " + movstmt.kind);
 
         }
 
@@ -318,6 +350,18 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
         return "write interpreted";
 
+    }
+
+    @Override
+    public Void visitAndCMovCond(AndC movcond) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitAndCMovCond'");
+    }
+
+    @Override
+    public Void visitOrCMovCond(OrC movcond) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitOrCMovCond'");
     }
     
 }

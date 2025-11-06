@@ -39,6 +39,7 @@ find stars in "Black Panther: Wakanda Forever"
 find genre of "Suicide 2"
 find summary of "The Lion King"
 find length of "The Little Mermaid"
+find ratings for "Sing 2"
 ```
 
 <p>Outputs:</p>
