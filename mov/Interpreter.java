@@ -2,6 +2,8 @@ package mov;
 
 import core.data.*;
 
+import static mov.MovTokenType.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +17,6 @@ import mov.MovStmt.FindS;
 import mov.MovStmt.HaveS;
 import mov.MovStmt.SayS;
 import mov.MovStmt.WriteS;
-
-import static mov.MovTokenType.*;
 
 class Movie {
     String movie_name;
@@ -62,27 +62,7 @@ class Movie {
 
 public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void> {
 
-    public List<Movie> actionDB = new ArrayList<>();
-    public List<Movie> adventureDB = new ArrayList<>();
-    public List<Movie> animationDB = new ArrayList<>();
-    public List<Movie> biographyDB = new ArrayList<>();
-    public List<Movie> crimeDB = new ArrayList<>();
-    public List<Movie> familyDB = new ArrayList<>();
-    public List<Movie> fantasyDB = new ArrayList<>();
-    public List<Movie> film_noirDB = new ArrayList<>();
-    public List<Movie> historyDB = new ArrayList<>();
-    public List<Movie> horrorDB = new ArrayList<>();
-    public List<Movie> mysteryDB = new ArrayList<>();
-    public List<Movie> romanceDB = new ArrayList<>();
-    public List<Movie> scifiDB = new ArrayList<>();
-    public List<Movie> sportsDB = new ArrayList<>();
-    public List<Movie> thrillerDB = new ArrayList<>();
-    public List<Movie> warDB = new ArrayList<>();
-
-    List<Movie>[] allMoviesDB = new List[] {actionDB, adventureDB, animationDB, biographyDB,
-                                    crimeDB, familyDB, fantasyDB, film_noirDB,
-                                    historyDB, horrorDB, mysteryDB, romanceDB,
-                                    scifiDB, sportsDB, thrillerDB, warDB };
+    public List<Movie> allMoviesDB = new ArrayList<>();
 
     public Interpreter() {
 
@@ -108,17 +88,20 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                                     historyDS, horrorDS, mysteryDS, romanceDS,
                                     scifiDS, sportsDS, thrillerDS, warDS };
                         
-        for (int i = 0; i < allMoviesDB.length; i++) {
-            allMoviesDB[i] = loadDB(allMoviesDB[i], allDataSources[i]);
-            System.out.println("Loaded " + allMoviesDB[i].size() + " movies into database " + i);
+        allMoviesDB = new ArrayList<Movie>();
+
+        for (int i = 0; i < allDataSources.length; i++) {
+            
+            loadDB(allMoviesDB, allDataSources[i]);
 
         }
+
+        System.out.println("Loaded " + allMoviesDB.size() + " movies into database");
         
     }
 
     public List<Movie> loadDB(List<Movie> db, DataSource ds) {
         ds.load();
-        ds.printUsageString();
 
         List<Movie> movies = ds.fetchList(Movie.class, "movie_name", "year", "certificate", "genre", 
                                                     "rating", "description", "director", "star");
@@ -182,52 +165,127 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
     }
 
+    @SuppressWarnings("incomplete-switch")
     @Override
     public Object visitFindSMovStmt(FindS movstmt) {
 
-        System.out.println("Finding " + movstmt.kind + " " + movstmt.identifier.lexeme
+        String search = (String) movstmt.identifier.literal;
+        List<Movie> foundMovie = new ArrayList<>();
+
+        System.out.println("Finding " + movstmt.kind + " " + search
+                + " query " + movstmt.query
                 + " with condition " + movstmt.condition);
 
+        System.out.println(allMoviesDB.size());
+
         if(movstmt.kind == Kind.MOVIES) {
-            List<String> movies = new ArrayList<>();
-            List<Movie> foundMovie = new ArrayList<>();
 
             switch(movstmt.query) {
 
                 case STARRING:
 
-                    for (int i = 0; i < allMoviesDB.length; i++) {
-                        for (int j = 0; j < allMoviesDB[i].size(); j++) {
-                            if (allMoviesDB[i].get(i).stars.contains(movstmt.identifier.lexeme)) {
-                                foundMovie.add(allMoviesDB[i].get(i));
-                            }
+                    for (Movie m : allMoviesDB) {
+                        if(m.stars.contains(search)) {
+                            foundMovie.add(m);
                         }
                     }
                     break;
                 
                 case DIRECTED_BY:
 
-                    List<String> directors = new ArrayList<>();
-                    
-                    //for (int i = 0; i < allMoviesDB.length; i++) {
-                        for (int j = 0; j < actionDB.size(); j++) {
-                            directors.add(actionDB.get(j).director);
-                            for (String d : directors) {
-                                if (d.contains(movstmt.identifier.lexeme)) {
-                                    foundMovie.add(actionDB.get(j));
-                                }
-                            }
+                    for (Movie m : allMoviesDB) {
+                        if(m.director.contains(search)) {
+                            foundMovie.add(m);
                         }
-                        System.out.println("Found movies: " + foundMovie);
-                        return foundMovie;
-                    //}
+                    }
+                    break;
 
             }
             
             System.out.println("Found movies: " + foundMovie);
             return foundMovie;
+        } else if (movstmt.kind == Kind.GENRE) {
+
+            String genre = "";
+
+            switch(movstmt.query) {
+
+                case FOR:
+
+                    for(Movie m : allMoviesDB) {
+                        if(m.stars.contains(search)) {
+                            foundMovie.add(m);
+                        }
+                    }
+
+                    for (Movie m : foundMovie) {
+                        
+                        if (!(genre.contains(m.genre))) {
+                            genre += m.genre;
+                        }
+
+                    }
+
+                    break;
+
+                case OF:
+
+                    for (Movie m : allMoviesDB) {
+                        if(m.movie_name.equals(search)) {
+                            foundMovie.add(m);
+                        }
+                    }
+
+                    for (Movie m : foundMovie) {
+
+                        if (!(genre.equals(m.genre))) {
+                            genre += m.genre;
+                        }
+
+                    }
+
+                    break;
+
+            }
+
+            System.out.println("Genre: " + genre);
+            return genre;
+            
+        } else if (movstmt.kind == Kind.STARS) {
+
+            String stars = "";
+
+            switch (movstmt.query) {
+
+                case IN:
+
+                    for (Movie m : allMoviesDB) {
+
+                        if (m.movie_name.contains(search)) {
+                            foundMovie.add(m);
+                        }
+
+                    }
+
+                    for (Movie m : foundMovie) {
+
+                        if (!(stars.contains(m.stars))) {
+                            stars += m.stars;
+                        }
+
+                    }
+
+                    break;
+
+            }
+
+            System.out.println("Stars: " + stars);
+            return stars;
+
         } else {
+
             System.out.println("Unknown kind: " + movstmt.kind);
+
         }
 
         return "find interpreted";

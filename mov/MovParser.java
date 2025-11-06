@@ -33,7 +33,6 @@ public class MovParser {
     }
 
     private MovStmt findStatement() {
-        System.out.println("in findStatement");
         Kind kind = kind();
         Query query = query();
         MovToken obj = advance();
@@ -115,7 +114,6 @@ public class MovParser {
     }
 
     private MovCond condition() {
-        System.out.println("in condition");
         if (match(MovTokenType.NOT)) {
             return negCondition(); 
         } if (match(MovTokenType.STRC)) {
