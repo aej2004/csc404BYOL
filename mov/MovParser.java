@@ -33,6 +33,7 @@ public class MovParser {
     }
 
     private MovStmt findStatement() {
+        System.out.println("in findStatement");
         Kind kind = kind();
         Query query = query();
         MovToken obj = advance();
@@ -114,8 +115,20 @@ public class MovParser {
     }
 
     private MovCond condition() {
-        if (match(MovTokenType.NOT)) {
-            return negCondition(); 
+        System.out.println("in condition");
+
+        MovCond left = primaryCondition();
+        while (match(MovTokenType.AND, MovTokenType.OR)) {
+            MovToken operator = previous();
+            MovCond right = primaryCondition();
+            left = new MovCond.BinaryC(left, right, operator);
+        }
+        return left;
+    }
+    private MovCond primaryCondition() {
+        if (match(MovTokenType.NOT)){
+            MovCond inner = primaryCondition();
+            return new MovCond.NegC(inner);
         } if (match(MovTokenType.STRC)) {
             return strCondition();
         } if (match(MovTokenType.KINDC)) {
@@ -126,12 +139,9 @@ public class MovParser {
             return whereCondition();
         } if (match(MovTokenType.WITHOUT)) {
             return withoutCondition();
-        } if (match(MovTokenType.AND)) {
-            return andCondition();
-        } if (match(MovTokenType.OR)) {
-            return orConditon();
-        }
+        } else {
             return null; // no condition
+        }
     }
 
     public MovCond whereCondition() {
@@ -179,21 +189,6 @@ public class MovParser {
         MovCond right = condition(); 
         return new MovCond.LtC(left, right, operator);
     }
-
-    private MovCond andCondition(){
-        MovCond left = condition(); 
-        MovCond right = condition(); 
-        MovToken operator = new MovToken(MovTokenType.AND, "and",null,0);
-        return new MovCond.AndC(condition(), condition());
-    }
-
-    private MovCond orConditon(){
-        MovCond left = condition();
-        MovCond right = condition();
-        MovToken operator = new MovToken(MovTokenType.OR, "or",null,0);
-        return new MovCond.OrC(condition(), condition());
-    }
-
 
 
 

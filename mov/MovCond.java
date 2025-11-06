@@ -9,8 +9,7 @@ abstract class MovCond{
     R visitStrCMovCond(StrC movcond);
     R visitKindCMovCond(KindC movcond);
     R visitLtCMovCond(LtC movcond);
-    R visitAndCMovCond(AndC movcond);
-    R visitOrCMovCond(OrC movcond);
+    R visitBinaryC(BinaryC movcond);
   }
   static class NegC extends MovCond {
     NegC(MovCond condition) {
@@ -87,46 +86,28 @@ abstract class MovCond{
       return "LtC(" + left + ", " + right + ", " + operator + ")";
     }
   }
-
-  static class AndC extends MovCond {
+  static class BinaryC extends MovCond {
     final MovCond left;
     final MovCond right;
+    final MovToken operator;
 
-    AndC(MovCond left, MovCond right) {
+    public BinaryC(MovCond left, MovCond right, MovToken operator) {
       this.left = left;
       this.right = right;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitAndCMovCond(this);
-    }
-
-    @Override
-    public String toString() {
-      return "AndC(" + left + ", " + right + ")";
-    }
+      this.operator = operator;
   }
 
-  static class OrC extends MovCond {
-    final MovCond left;
-    final MovCond right;
-
-    OrC(MovCond left, MovCond right) {
-      this.left = left;
-      this.right = right;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitOrCMovCond(this);
-    }
-
-    @Override
-    public String toString() {
-      return "OrC(" + left + ", " + right + ")";
-    }
+  @Override
+  public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitBinaryC(this); // make sure Visitor has this method
   }
+
+  @Override
+  public String toString() {
+      return "(" + left + " " + operator.lexeme + " " + right + ")";
+  }
+}
+
 
   abstract <R> R accept(Visitor<R> visitor);
 }
