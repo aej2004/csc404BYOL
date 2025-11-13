@@ -9,11 +9,12 @@ import java.util.List;
 
 import javax.xml.crypto.Data;
 
-import mov.MovCond.AndC;
+//import mov.MovCond.AndC;
+import mov.MovCond.BinaryC;
 import mov.MovCond.KindC;
 import mov.MovCond.LtC;
 import mov.MovCond.NegC;
-import mov.MovCond.OrC;
+//import mov.MovCond.OrC;
 import mov.MovCond.StrC;
 import mov.MovStmt.FindS;
 import mov.MovStmt.HaveS;
@@ -346,6 +347,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
     }
 
+    /* 
     @Override
     public Void visitAndCMovCond(AndC movcond) {
         // TODO Auto-generated method stub
@@ -356,6 +358,13 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     public Void visitOrCMovCond(OrC movcond) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visitOrCMovCond'");
+    }
+    */
+
+    @Override
+    public Void visitBinaryC(BinaryC movcond) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitBinaryC'");
     }
     
 }
