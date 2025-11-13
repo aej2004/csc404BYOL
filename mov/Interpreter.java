@@ -174,12 +174,6 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         String search = (String) movstmt.identifier.literal;
         List<Movie> foundMovie = new ArrayList<>();
 
-        System.out.println("Finding " + movstmt.kind + " " + search
-                + " query " + movstmt.query
-                + " with condition " + movstmt.condition);
-
-        System.out.println(allMoviesDB.size());
-
         switch (movstmt.kind) {
 
             case MOVIES:
