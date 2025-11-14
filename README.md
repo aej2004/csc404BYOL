@@ -35,11 +35,14 @@ condition -> str | kind query str | <conditon> > <condition>
 find movies starring "Tom Hanks"
 find movies directed by "Chris Columbus"
 find genre for "Tom Hanks"
-find stars in "Black Panther: Wakanda Forever"
 find genre of "Suicide 2"
+find stars in "Black Panther: Wakanda Forever"
 find summary of "The Lion King"
 find length of "The Little Mermaid"
 find ratings for "Sing 2"
+find year for "Black Panther: Wakanda Forever"
+find length of "The Lion King"
+find director of "The Lion King"
 ```
 
 <p>Outputs:</p>
