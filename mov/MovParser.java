@@ -115,7 +115,7 @@ public class MovParser {
     }
 
     private MovCond condition() {
-        System.out.println("in condition");
+        System.out.println("in condition " + peek().type);
 
         MovCond left = primaryCondition();
         while (match(MovTokenType.AND, MovTokenType.OR)) {
@@ -126,6 +126,7 @@ public class MovParser {
         return left;
     }
     private MovCond primaryCondition() {
+        System.out.println("in primarycondition " + peek().type);
         if (match(MovTokenType.NOT)){
             MovCond inner = primaryCondition();
             return new MovCond.NegC(inner);
@@ -135,7 +136,7 @@ public class MovParser {
             return kindCondition();
         } if (match(MovTokenType.LESS, MovTokenType.LESS_EQUAL, MovTokenType.GREATER, MovTokenType.GREATER_EQUAL)) {
             return ltCondition();
-        }if (match(MovTokenType.WHERE)) {
+        }  if (match(MovTokenType.WHERE)) {
             return whereCondition();
         } if (match(MovTokenType.WITHOUT)) {
             return withoutCondition();

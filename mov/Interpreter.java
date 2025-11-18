@@ -5,7 +5,12 @@ import core.data.*;
 import static mov.MovTokenType.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.crypto.Data;
 
@@ -41,9 +46,9 @@ class Movie {
         this.stars = stars;
 
         try {
-            this.rating = Integer.parseInt(rating);
+            this.rating = Double.parseDouble(rating);
         } catch (NumberFormatException e) {
-            this.rating = 0; // default value if parsing fails
+            this.rating = 0.0; // default value if parsing fails
         }
 
         try {
@@ -72,6 +77,7 @@ class Movie {
 public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void> {
 
     public List<Movie> allMoviesDB = new ArrayList<>();
+    private Map<String, Object> globals = new HashMap<>();
 
     public Interpreter() {
 
@@ -132,8 +138,8 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         }
     }
 
-    private void execute(MovStmt stmt) {
-        stmt.accept(this);
+    private Object execute(MovStmt stmt) {
+        return stmt.accept(this);
     }
 
 
@@ -178,6 +184,12 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     public Object visitFindSMovStmt(FindS movstmt) {
 
         String search = (String) movstmt.identifier.literal;
+        List<Movie> listToSearch = allMoviesDB;
+
+        if (movstmt.identifier.type == MovTokenType.IDENTIFIER) {
+            listToSearch = (List<Movie>) globals.get(movstmt.identifier.lexeme);
+        }
+
         List<Movie> foundMovie = new ArrayList<>();
 
         switch (movstmt.kind) {
@@ -185,14 +197,14 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
             case MOVIES:
                 switch (movstmt.query) {
                     case STARRING:
-                        for (Movie m : allMoviesDB) {
+                        for (Movie m : listToSearch) {
                             if(m.stars.contains(search)) {
                                 foundMovie.add(m);
                             }
                         }
                         break;
                     case DIRECTED_BY:
-                        for (Movie m : allMoviesDB) {
+                        for (Movie m : listToSearch) {
                             if(m.director.contains(search)) {
                                 foundMovie.add(m);
                             }
@@ -208,7 +220,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 double rating = -1; 
                 switch (movstmt.query) {
                     case FOR:
-                        for(Movie m : allMoviesDB) {
+                        for(Movie m : listToSearch) {
                             if (m.movie_name.equals(search)){
                                 foundMovie.add(m);
                             }
@@ -228,7 +240,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 String genre = "";
                 switch(movstmt.query) {
                     case FOR:
-                        for(Movie m : allMoviesDB) {
+                        for(Movie m : listToSearch) {
                             if(m.stars.contains(search)) {
                                 foundMovie.add(m);
                             }
@@ -240,7 +252,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                         }
                         break;
                     case OF:
-                        for (Movie m : allMoviesDB) {
+                        for (Movie m : listToSearch) {
                             if(m.movie_name.equals(search)) {
                                 foundMovie.add(m);
                             }
@@ -258,31 +270,33 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 return genre;
 
             case STARS: 
-                String stars = "";
+                Set<String> starSet = new HashSet<>();
                 switch (movstmt.query) {
                     case IN:
-                        for (Movie m : allMoviesDB) {
-                            if (m.movie_name.contains(search)) {
-                                foundMovie.add(m);
+                        if (search == null) {
+                            foundMovie = listToSearch;
+                        } else {
+                            for (Movie m : listToSearch) {
+                                if (m.movie_name.contains(search)) {
+                                    foundMovie.add(m);
+                                }
                             }
                         }
                         for (Movie m : foundMovie) {
-                            if (!(stars.contains(m.stars))) {
-                                stars += m.stars;
-                            }
+                            starSet.addAll(Arrays.asList(m.stars.split("\\s*,\\s*")));
                         }
                         break;
                     default:
                         break;
                 }
-                System.out.println("Stars: " + stars);
-                return stars;
+                System.out.println("Stars: " + starSet);
+                return starSet.toString();
 
             case YEAR:
                 int year = -1;
                 switch (movstmt.query) {
                     case FOR:
-                        for (Movie m : allMoviesDB) {
+                        for (Movie m : listToSearch) {
                             if (m.movie_name.equals(search)) {
                                 foundMovie.add(m);
                             }
@@ -301,7 +315,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 String description = "";
                 switch (movstmt.query) {
                     case OF:
-                        for (Movie m : allMoviesDB) {
+                        for (Movie m : listToSearch) {
                             if (m.movie_name.equals(search)) {
                                 foundMovie.add(m);
                             }
@@ -320,7 +334,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 int length = -1;
                 switch (movstmt.query) {
                     case OF:
-                        for (Movie m : allMoviesDB) {
+                        for (Movie m : listToSearch) {
                             if (m.movie_name.equals(search)) {
                                 foundMovie.add(m);
                             }
@@ -338,7 +352,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 String director = "";
                 switch (movstmt.query) {
                     case OF:
-                        for (Movie m : allMoviesDB) {
+                        for (Movie m : listToSearch) {
                             if (m.movie_name.equals(search)) {
                                 foundMovie.add(m);
                             }
@@ -359,12 +373,16 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @Override
-    public Object visitHaveSMovStmt(HaveS movstmt) {
+    public Object visitHaveSMovStmt(HaveS havstmt) {
         
-        System.out.println("Checking if have " + movstmt.identifier.lexeme + " " + movstmt.statement);
+        System.out.println("Checking if have " + havstmt.identifier.lexeme + " " + havstmt.statement);
 
-        return "have interpreted";
+        String var = havstmt.identifier.lexeme;
+        Object result = execute(havstmt.statement);
 
+        globals.put(var, result);
+
+        return result;
     }
 
     @Override
@@ -385,13 +403,24 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
         switch (movstmt.kind) {
             case MOVIES:
+                
+                String search = (String) movstmt.identifier.literal;
                 List<Movie> foundMovies = new ArrayList<>();
+                List<String> movNames = new ArrayList<>();
+
                 for (Movie m : allMoviesDB) {
-                    if (m.stars.contains(movstmt.identifier.lexeme)) {
+                    if (m.stars.contains(search)) {
                         foundMovies.add(m);
                     }
                 }
-                System.out.println("Movies starring " + movstmt.identifier.lexeme + ": " + foundMovies);
+
+                for (Movie m : foundMovies) {
+                    if (!movNames.contains(m.movie_name)) {
+                        movNames.add(m.movie_name);
+                    }
+                }
+
+                System.out.println("Movies starring " + movstmt.identifier.lexeme + ": " + movNames);
                 break;
             default:
                 System.out.println("Unknown kind in write statement: " + movstmt.kind);

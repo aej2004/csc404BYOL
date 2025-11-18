@@ -12,7 +12,7 @@
 ## Grammar: 
 
 ```
-findStmt -> "find" kind query str (where | without. <condition>)
+findStmt -> "find" kind query (str | identifier) (where | without. <condition>)
 
 haveStmt -> "have" ... = <findStmt>
 
@@ -33,7 +33,7 @@ condition -> str | kind query str | <conditon> > <condition>
 
 ```
 find movies starring "Tom Hanks"
-find movies directed by "Chris Columbus"
+find movies directed by "Ryan Coogler"
 find genre for "Tom Hanks"
 find genre of "Suicide 2"
 find stars in "Black Panther: Wakanda Forever"
@@ -54,7 +54,7 @@ The string or the list of strings that go with the kind and string given.
 ### Example Program 2 Declaration
 
 ```
-have tomMovies = find movies with "tom hanks"
+have tomMovies = find movies where "tom hanks"
 find stars in tomMovies without "tom hanks"
 have lkActors = find stars in "The Lion King"
 find movies in lkActors without "The Lion King"
@@ -94,6 +94,7 @@ Returns the new summary for the film that the person just wrote.
 
 ```
 write movies starring "Tom Hanks"
+write movies directed by "Ryan Coogler"
 write stars in "The Lion King" where movie is "The Little Mermaid"
 ```
 

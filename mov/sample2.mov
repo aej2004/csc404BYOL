@@ -1,1 +1,6 @@
-write movies starring "Tori Kelly"
+find stars in "Top"
+
+
+
+have tomMovies = find movies starring "Winslow Fegley" 
+find stars in tomMovies
