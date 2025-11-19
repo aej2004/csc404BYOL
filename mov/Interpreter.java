@@ -33,7 +33,7 @@ class Movie {
     String description;
     String director;
     String stars;
-    int length;
+    String length;
 
     public Movie(String movie_name, String year, String certificate, String genre,
                  String rating, String description, String director, String stars,
@@ -44,6 +44,7 @@ class Movie {
         this.description = description;
         this.director = director;
         this.stars = stars;
+        this.length = length;
 
         try {
             this.rating = Double.parseDouble(rating);
@@ -55,12 +56,6 @@ class Movie {
             this.year = Integer.parseInt(year);
         } catch (NumberFormatException e) {
             this.year = 0; // default value if parsing fails
-        }
-
-        try {
-            this.length = Integer.parseInt(length);
-        } catch (NumberFormatException e) {
-            this.length = 0; // default value if parsing fails
         }
     }
 
@@ -76,8 +71,8 @@ class Movie {
 
 public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void> {
 
-    public List<Movie> allMoviesDB = new ArrayList<>();
-    private Map<String, Object> globals = new HashMap<>();
+    public Set<Movie> allMoviesDB = new HashSet<>();
+    public Map<String, Object> globals = new HashMap<>();
 
     public Interpreter() {
 
@@ -102,8 +97,6 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                                     crimeDS, familyDS, fantasyDS, film_noirDS,
                                     historyDS, horrorDS, mysteryDS, romanceDS,
                                     scifiDS, sportsDS, thrillerDS, warDS };
-                        
-        allMoviesDB = new ArrayList<Movie>();
 
         for (int i = 0; i < allDataSources.length; i++) {
             
@@ -115,11 +108,12 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         
     }
 
-    public List<Movie> loadDB(List<Movie> db, DataSource ds) {
+    @SuppressWarnings("unchecked")
+    public Set<Movie> loadDB(Set<Movie> db, DataSource ds) {
         ds.load();
 
-        List<Movie> movies = ds.fetchList(Movie.class, "movie_name", "year", "certificate", "genre", 
-                                                    "rating", "description", "director", "star", "runtime");
+        Set<Movie> movies = new HashSet<>(ds.fetchList(Movie.class, "movie_name", "year", "certificate", "genre", 
+                                                            "rating", "description", "director", "star", "runtime"));
 
         for (Movie m : movies) {
             db.add(m);
@@ -181,208 +175,172 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @Override
-    public Object visitFindSMovStmt(FindS movstmt) {
+    public Set<Object> visitFindSMovStmt(FindS findstmt) {
+        Set<Object> result = new HashSet<>();
 
-        String search = (String) movstmt.identifier.literal;
-        List<Movie> listToSearch = allMoviesDB;
-
-        if (movstmt.identifier.type == MovTokenType.IDENTIFIER) {
-            listToSearch = (List<Movie>) globals.get(movstmt.identifier.lexeme);
+        if (findstmt.identifier.type == STRING) {
+            result = findString(findstmt);
+        } else if (findstmt.identifier.type == IDENTIFIER) {
+            result = findIdentifier(findstmt);
+        } else {
+            throw new RuntimeError(findstmt.identifier, "Invalid identifier type in FindS statement");
         }
 
-        List<Movie> foundMovie = new ArrayList<>();
+        System.out.println(result);
+        return result;
+    }
 
-        switch (movstmt.kind) {
+    public Set<Object> findString(FindS findstmt) {
+        String search = (String) findstmt.identifier.literal;
+        Set<Object> result = new HashSet<>();
+        result = searchDB(findstmt.kind,findstmt.query, search);
+        return result;
+    }
 
+    @SuppressWarnings("unchecked")
+    public Set<Object> findIdentifier(FindS findstmt) {
+        Set<Object> result = new HashSet<>();
+        Set<Object> listCreated = (Set<Object>) globals.get(findstmt.identifier.lexeme);
+
+        switch (findstmt.kind) {
             case MOVIES:
-                switch (movstmt.query) {
-                    case STARRING:
-                        for (Movie m : listToSearch) {
-                            if(m.stars.contains(search)) {
-                                foundMovie.add(m);
-                            }
+                for (Object obj : listCreated) {
+                    if (obj instanceof String) {
+                        switch (findstmt.query) {
+                            case STARRING: 
+                                String star = (String) obj;
+                                result.addAll(searchDB(Kind.MOVIES, Query.STARRING, star));
+                                break;
+                            case DIRECTED_BY:
+                                String director = (String) obj;
+                                result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, director));
+                                break;
                         }
-                        break;
-                    case DIRECTED_BY:
-                        for (Movie m : listToSearch) {
-                            if(m.director.contains(search)) {
-                                foundMovie.add(m);
-                            }
-                        }
-                        break;
-                    default:
-                        break;
+                    }
                 }
-                System.out.println("Found movies: " + foundMovie);
-                return foundMovie;
-
-            case RATINGS:
-                double rating = -1; 
-                switch (movstmt.query) {
-                    case FOR:
-                        for(Movie m : listToSearch) {
-                            if (m.movie_name.equals(search)){
-                                foundMovie.add(m);
-                            }
-                        }
-                        for(Movie m : foundMovie) {
-                            rating = m.rating;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                System.out.println("Found movies: " + foundMovie);
-                System.out.println("Rating: " + rating);
-                return rating;
-
-            case GENRE:
-                String genre = "";
-                switch(movstmt.query) {
-                    case FOR:
-                        for(Movie m : listToSearch) {
-                            if(m.stars.contains(search)) {
-                                foundMovie.add(m);
-                            }
-                        }
-                        for (Movie m : foundMovie) {
-                            if (!(genre.contains(m.genre))) {
-                                genre += m.genre;
-                            }
-                        }
-                        break;
-                    case OF:
-                        for (Movie m : listToSearch) {
-                            if(m.movie_name.equals(search)) {
-                                foundMovie.add(m);
-                            }
-                        }
-                        for (Movie m : foundMovie) {
-                            if (!(genre.equals(m.genre))) {
-                                genre += m.genre;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                System.out.println("Genre: " + genre);
-                return genre;
-
-            case STARS: 
-                Set<String> starSet = new HashSet<>();
-                switch (movstmt.query) {
-                    case IN:
-                        if (search == null) {
-                            foundMovie = listToSearch;
-                        } else {
-                            for (Movie m : listToSearch) {
-                                if (m.movie_name.contains(search)) {
-                                    foundMovie.add(m);
-                                }
-                            }
-                        }
-                        for (Movie m : foundMovie) {
-                            starSet.addAll(Arrays.asList(m.stars.split("\\s*,\\s*")));
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                System.out.println("Stars: " + starSet);
-                return starSet.toString();
-
-            case YEAR:
-                int year = -1;
-                switch (movstmt.query) {
-                    case FOR:
-                        for (Movie m : listToSearch) {
-                            if (m.movie_name.equals(search)) {
-                                foundMovie.add(m);
-                            }
-                        }
-                        for (Movie m : foundMovie) {
-                            year = m.year;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                System.out.println("Year: " + year);
-                return year;
-
-            case SUMMARY:
-                String description = "";
-                switch (movstmt.query) {
-                    case OF:
-                        for (Movie m : listToSearch) {
-                            if (m.movie_name.equals(search)) {
-                                foundMovie.add(m);
-                            }
-                        }
-                        for (Movie m : foundMovie) {
-                            description = m.description;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                System.out.println("Description: " + description);
-                return description;
-
-            case LENGTH:
-                int length = -1;
-                switch (movstmt.query) {
-                    case OF:
-                        for (Movie m : listToSearch) {
-                            if (m.movie_name.equals(search)) {
-                                foundMovie.add(m);
-                            }
-                        }
-                        for (Movie m : foundMovie) {
-                            length = m.length;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                System.out.println("Length: " + length);
-                return length;
-            case DIRECTOR:
-                String director = "";
-                switch (movstmt.query) {
-                    case OF:
-                        for (Movie m : listToSearch) {
-                            if (m.movie_name.equals(search)) {
-                                foundMovie.add(m);
-                            }
-                        }
-                        for (Movie m : foundMovie) {
-                            director = m.director;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                System.out.println("Director: " + director);
-                return director;
+                break;
             default:
-                System.out.println("Unknown kind: " + movstmt.kind);
+                break;
         }
-        return "find interpreted";
+
+        return result;
+    }
+
+    public Set<Object> searchDB(Kind kind, Query query, String search){
+        Set<Object> result = new HashSet<>();
+        switch (kind) {
+            case MOVIES:
+                if (query == Query.STARRING) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.stars.contains(search)) {
+                            result.add(m.movie_name);
+                        }
+                    }
+                } else if (query == Query.DIRECTED_BY) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.director.contains(search)) {
+                            result.add(m.movie_name);
+                        }
+                    }
+                } 
+                break;
+            case RATINGS:
+                for (Movie m : allMoviesDB) {
+                    if (m.movie_name.contains(search)) {
+                        result.add(m.rating);
+                    }
+                }
+                break;
+            case GENRE:
+                if (query == Query.FOR) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.stars.contains(search)) {
+                            //System.out.println("Found movie: " + m.genre);
+                            result.addAll(Arrays.asList(m.genre.split("\\s*,\\s*")));
+                        }
+                    }
+                } else if (query == Query.OF) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.movie_name.contains(search)) {
+                            //System.out.println("Found movie: " + m.genre);
+                            result.addAll(Arrays.asList(m.genre.split("\\s*,\\s*")));
+                        }
+                    }
+                }
+            case STARS:
+                for (Movie m : allMoviesDB) {
+                    if (m.movie_name.contains(search)) {
+                        result.addAll(Arrays.asList(m.stars.split("\\s*,\\s*")));
+                    }
+                }
+                break;
+            case YEAR:
+                if (query == Query.IN) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.movie_name.contains(search) && m.year != 0) {
+                            result.add(m.year);
+                        }
+                    }
+                } else if (query == Query.FOR) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.stars.contains(search) && m.year != 0) {
+                            result.add(m.year);
+                        }
+                    }
+                } else if (query == Query.OF) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.director.contains(search) && m.year != 0) {
+                            result.add(m.year);
+                        }
+                    }
+                }
+                break;
+            case SUMMARY:
+                for (Movie m : allMoviesDB) {
+                    if (m.movie_name.contains(search)) {
+                        result.add(m.description);
+                    }
+                }
+                break;
+            case LENGTH:
+                for (Movie m : allMoviesDB) {
+                    if (m.movie_name.contains(search)) {
+                        result.add(m.length);
+                    }
+                }
+                break;
+            case DIRECTOR:
+                if(query == Query.FOR) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.movie_name.contains(search)) {
+                            result.addAll(Arrays.asList(m.director.split("\\s*,\\s*")));
+                        }
+                    }
+                } else if (query == Query.OF) {
+                    for (Movie m : allMoviesDB) {
+                        if (m.stars.contains(search)) {
+                            result.addAll(Arrays.asList(m.director.split("\\s*,\\s*")));
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        return result;
     }
 
     @Override
     public Object visitHaveSMovStmt(HaveS havstmt) {
         
-        System.out.println("Checking if have " + havstmt.identifier.lexeme + " " + havstmt.statement);
-
         String var = havstmt.identifier.lexeme;
+        // Execute the statement to get the result
         Object result = execute(havstmt.statement);
 
         globals.put(var, result);
 
-        return result;
+        return null;
+
     }
 
     @Override
@@ -400,31 +358,6 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         
         System.out.println("Writing " + movstmt.kind + " " + movstmt.query
                 + " " + movstmt.identifier.lexeme + " with condition " + movstmt.condition);
-
-        switch (movstmt.kind) {
-            case MOVIES:
-                
-                String search = (String) movstmt.identifier.literal;
-                List<Movie> foundMovies = new ArrayList<>();
-                List<String> movNames = new ArrayList<>();
-
-                for (Movie m : allMoviesDB) {
-                    if (m.stars.contains(search)) {
-                        foundMovies.add(m);
-                    }
-                }
-
-                for (Movie m : foundMovies) {
-                    if (!movNames.contains(m.movie_name)) {
-                        movNames.add(m.movie_name);
-                    }
-                }
-
-                System.out.println("Movies starring " + movstmt.identifier.lexeme + ": " + movNames);
-                break;
-            default:
-                System.out.println("Unknown kind in write statement: " + movstmt.kind);
-        }
 
         return "write interpreted";
 

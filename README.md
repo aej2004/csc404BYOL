@@ -34,15 +34,18 @@ condition -> str | kind query str | <conditon> > <condition>
 ```
 find movies starring "Tom Hanks"
 find movies directed by "Ryan Coogler"
+find ratings for "Sing 2"
 find genre for "Tom Hanks"
 find genre of "Suicide 2"
 find stars in "Black Panther: Wakanda Forever"
-find summary of "The Lion King"
+find summary of "Sing 2"
 find length of "The Little Mermaid"
-find ratings for "Sing 2"
-find year for "Black Panther: Wakanda Forever"
-find length of "The Lion King"
-find director of "The Lion King"
+find year in "Black Panther: Wakanda Forever"
+find year for "Tori Kelly"
+find year of "Ryan Coogler"
+find length of "Black Panther: Wakanda Forever"
+find director for "Black Panther: Wakanda Forever"
+find director of "Tori Kelly"
 ```
 
 <p>Outputs:</p>
@@ -54,10 +57,12 @@ The string or the list of strings that go with the kind and string given.
 ### Example Program 2 Declaration
 
 ```
-have tomMovies = find movies where "tom hanks"
-find stars in tomMovies without "tom hanks"
+have actors = find stars in "Sing 2"
+find movies starring actors
+have tomMovies = find movies where "tom hanks"find stars in tomMovies
+ without "tom hanks"
 have lkActors = find stars in "The Lion King"
-find movies in lkActors without "The Lion King"
+find movies starring lkActors without "The Lion King"
 ```
 
 <p>Outputs:</p>
