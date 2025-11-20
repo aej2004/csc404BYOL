@@ -6,10 +6,27 @@ package mov;
 abstract class MovStmt {
   interface Visitor<R> {
     R visitFindSMovStmt(FindS movstmt);
-    R visitHaveSMovStmt(HaveS movstmt);
-    R visitSaySMovStmt(SayS movstmt);
     R visitWriteSMovStmt(WriteS movstmt);
+    R visitExpressionStmt(Expression movstmt);
   }
+
+  public static class Expression extends MovStmt {
+    public final MovExpr expression;
+    public Expression(MovExpr expression) {
+      this.expression = expression;
+    }
+    
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+        return visitor.visitExpressionStmt(this);
+    }
+
+    @Override
+    public String toString() {
+      return "Expression(" + expression + ")";
+    }
+  }
+
   static class FindS extends MovStmt {
     FindS(Kind kind, Query query, MovToken identifier, MovCond condition) {
       this.kind = kind;
@@ -33,48 +50,7 @@ abstract class MovStmt {
       return "FindS(" + kind + ", " + query + ", " + identifier + ", " + condition + ")";
     }
   }
-    public static class HaveS extends MovStmt {
-      final MovToken identifier; // variable name
-      final MovStmt statement;   // the statement being assigned
-
-    HaveS(MovToken identifier, MovStmt statement) {
-        this.identifier = identifier;
-        this.statement = statement;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitHaveSMovStmt(this);
-    }
-
-    @Override
-    public String toString() {
-      return "HaveS(" + identifier + ", " + statement + ")";
-    }
-  }
-  static class SayS extends MovStmt {
-
-    final MovToken identifier;
-    final MovToken ratsum;
-    final MovToken numstr;
-
-    SayS(MovToken identifier, MovToken ratsum, MovToken numstr) {
-      this.identifier = identifier;
-      this.ratsum = ratsum;
-      this.numstr = numstr;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitSaySMovStmt(this);
-    }
-
-
-    @Override
-    public String toString() {
-      return "SayS(" + identifier + ", " + ratsum + ", " + numstr + ")";
-    }
-  }
+ 
   static class WriteS extends MovStmt {
     WriteS(Kind kind, Query query, MovToken identifier, MovCond condition) {
       this.kind = kind;

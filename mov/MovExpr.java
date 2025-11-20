@@ -7,6 +7,49 @@ abstract class MovExpr {
   interface Visitor<R> {
     R visitWhereMovExpr(Where movexpr);
     R visitWithoutMovExpr(Without movexpr);
+    R visitHaveMovExpr(Have movexpr);
+    R visitSayMovExpr(Say movexpr);
+  }
+  
+  static class Have extends MovExpr {
+    final MovToken identifier;
+    final MovExpr statement;
+
+    Have(MovToken identifier, MovExpr statement) {
+      this.identifier = identifier;
+      this.statement = statement;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitHaveMovExpr(this);
+    }
+
+    @Override
+    public String toString() {
+      return "Have(" + identifier + ", " + statement + ")";
+    }
+  }
+  static class Say extends MovExpr {
+    final MovToken identifier;
+    final MovToken ratsum;
+    final MovToken numstr;
+
+    Say(MovToken identifier, MovToken ratsum, MovToken numstr) {
+      this.identifier = identifier;
+      this.ratsum = ratsum;
+      this.numstr = numstr;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitSayMovExpr(this);
+    }
+
+    @Override
+    public String toString() {
+      return "Say(" + identifier + ", " + ratsum + ", " + numstr + ")";
+    }
   }
   static class Where extends MovExpr {
     Where(MovToken keyword, MovExpr condition) {

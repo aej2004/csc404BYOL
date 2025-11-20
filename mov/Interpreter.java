@@ -19,9 +19,6 @@ import mov.MovCond.KindC;
 import mov.MovCond.LtC;
 import mov.MovCond.NegC;
 import mov.MovCond.StrC;
-import mov.MovStmt.FindS;
-import mov.MovStmt.HaveS;
-import mov.MovStmt.SayS;
 import mov.MovStmt.WriteS;
 
 class Movie {
@@ -69,7 +66,7 @@ class Movie {
 }
 
 
-public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void> {
+public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void>, MovExpr.Visitor<Object> {
 
     public Set<Movie> allMoviesDB = new HashSet<>();
     public Map<String, Object> globals = new HashMap<>();
@@ -175,7 +172,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @Override
-    public Set<Object> visitFindSMovStmt(FindS findstmt) {
+    public Set<Object> visitFindSMovStmt(MovStmt.FindS findstmt) {
         Set<Object> result = new HashSet<>();
 
         if (findstmt.identifier.type == STRING) {
@@ -190,7 +187,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         return result;
     }
 
-    public Set<Object> findString(FindS findstmt) {
+    public Set<Object> findString(MovStmt.FindS findstmt) {
         String search = (String) findstmt.identifier.literal;
         Set<Object> result = new HashSet<>();
         result = searchDB(findstmt.kind,findstmt.query, search);
@@ -198,7 +195,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @SuppressWarnings("unchecked")
-    public Set<Object> findIdentifier(FindS findstmt) {
+    public Set<Object> findIdentifier(MovStmt.FindS findstmt) {
         Set<Object> result = new HashSet<>();
         Set<Object> listCreated = (Set<Object>) globals.get(findstmt.identifier.lexeme);
 
@@ -331,11 +328,10 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @Override
-    public Object visitHaveSMovStmt(HaveS havstmt) {
-        
-        String var = havstmt.identifier.lexeme;
+    public Object visitHaveMovExpr(MovExpr.Have expr) {
+        String var = expr.identifier.lexeme;
         // Execute the statement to get the result
-        Object result = execute(havstmt.statement);
+        Object result = expr.statement.accept(this);
 
         globals.put(var, result);
 
@@ -344,13 +340,18 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @Override
-    public Object visitSaySMovStmt(SayS movstmt) {
+    public Object visitSayMovExpr(MovExpr.Say expr) {
         
-        System.out.println("Saying " + movstmt.identifier.lexeme + " "
-                + movstmt.ratsum.lexeme + " " + movstmt.numstr.lexeme);
+        System.out.println("Saying " + expr.identifier.lexeme + " "
+                + expr.ratsum.lexeme + " " + expr.numstr.lexeme);
 
         return "say interpreted";
 
+    }
+    @Override
+    public Object visitExpressionStmt(MovStmt.Expression stmt) {
+          stmt.expression.accept(this);
+          return null;
     }
 
     @Override
@@ -361,6 +362,18 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
         return "write interpreted";
 
+    }
+
+    @Override
+    public Object visitWithoutMovExpr(MovExpr.Without expr) {
+    System.out.println("Visiting Without expression: " + expr);
+    return null;
+    } 
+
+    @Override
+    public Object visitWhereMovExpr(MovExpr.Where expr) {
+    System.out.println("Visiting Where expression: " + expr);
+    return null;
     }
 
     @Override

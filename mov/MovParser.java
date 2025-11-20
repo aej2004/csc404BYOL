@@ -26,10 +26,9 @@ public class MovParser {
 
     private MovStmt statement() {
         if (match(FIND)) return findStatement();
-        if (match(HAVE)) return haveStatment();
-        if (match(SAY)) return sayStatement();
         if (match(WRITE)) return writeStatement();
-        throw error(peek(), "Expect statement.");
+        MovExpr expr = expression();
+        return new MovStmt.Expression(expr);
     }
 
     private MovStmt findStatement() {
@@ -41,23 +40,6 @@ public class MovParser {
 
         return new MovStmt.FindS(kind, query, obj, condition);
     }
-
-    private MovStmt haveStatment() {
-        MovToken identifier = advance();
-        advance(); // consume the '='
-        MovStmt statement = statement();
-
-        return new MovStmt.HaveS(identifier, statement);
-    }
-
-    private MovStmt sayStatement() {
-        MovToken identifier = advance();
-        MovToken ratsum = ratsum();
-        MovToken numstr = numstr();
-        
-        return new MovStmt.SayS(identifier, ratsum, numstr);
-    }
-
     private MovStmt writeStatement() {
         Kind kind = kind();
         Query query = query();
@@ -65,6 +47,25 @@ public class MovParser {
         MovCond condition = condition();
 
         return new MovStmt.WriteS(kind, query, obj, condition);
+    }
+    private MovExpr expression(){
+        if (match(HAVE)) return haveExpression();
+        if (match(SAY)) return sayExpression();
+        throw error(peek(), "Expect expression.");
+    }
+
+    private MovExpr haveExpression() {
+        MovToken identifier = advance();
+        advance(); // consume the '='
+        MovExpr statement = expression();
+        return new MovExpr.Have(identifier, statement);
+    }
+
+    private MovExpr sayExpression() {
+        MovToken identifier = advance();
+        MovToken ratsum = ratsum();
+        MovToken numstr = numstr();
+        return new MovExpr.Say(identifier, ratsum, numstr);
     }
 
     private Kind kind() {
@@ -161,8 +162,12 @@ public class MovParser {
         System.out.println(peek().type);
         if (match(MovTokenType.STRING)) {
             String str = previous().lexeme;
+            return new MovCond.StrC(str, null);
+        } else if (isKind()){
             Kind kind = kind();
+            String str = advance().lexeme;
             return new MovCond.StrC(str, kind);
+
         } else {
             return null; // no condition after WITHOUT
         }
@@ -190,8 +195,6 @@ public class MovParser {
         MovCond right = condition(); 
         return new MovCond.LtC(left, right, operator);
     }
-
-
 
     private MovToken ratsum() {
         if (match(MovTokenType.RATINGS)) {
