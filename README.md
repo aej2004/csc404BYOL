@@ -113,8 +113,8 @@ outputs all the stars that are in both movies
 ### Example Program 5 Conditionals
 
 ```
-find movies with "tom hanks" where genre is "action"
-find stars in "The Lion King" where movies is "The Little Mermaid"
+find movies starring "Tom Hanks" where genre is "action"
+find stars in "The Lion King" where movies starring "Tom Hanks"
 ```
 
 <p>Outputs:</p>

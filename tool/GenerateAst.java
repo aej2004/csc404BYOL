@@ -14,17 +14,24 @@ public class GenerateAst {
         String outputDir = args[0];
 
         defineAst(outputDir, "MovStmt", Arrays.asList(
-            "FindS : Kind kind, Query query, MovToken identifier, MovCond condition",
-            "HaveS : MovToken identifier, MovStmt statement",
-            "SayS : MovToken identifier, Kind ratsum, MovToken numstr",
-            "WriteS : Kind kind, Query query, MovToken identifier, MovCond condition"
+      "FindS : Kind kind, Query query, MovToken identifier, MovCond condition",
+            "WriteS : Kind kind, Query query, MovToken identifier, MovCond condition",
+            "Expression : MovExpr expr"
         ));
 
         defineAst(outputDir, "MovCond", Arrays.asList(
-            "NegC : Condition condition",
+            "NegC : MovCond condition",
             "StrC : String str, Kind kind",
             "KindC : Kind kind, Query query, String str",
-            "LtC : Condition left, Condition right, MovToken operator"
+            "LtC : MovCond left, MovCond right, MovToken operator",
+            "BinaryC : MovCond left, MovCond right, MovToken operator"
+        ));
+
+        defineAst(outputDir, "MovExpr", Arrays.asList(
+            "Where : MovToken keyword, MovExpr condition",
+            "WithoutE : MovToken keyword, MovExpr condition",
+            "HaveE : MovToken identifier, MovStmt statement",
+            "SayE : MovToken identifier, MovToken ratsum, MovToken numstr"
         ));
     }
 

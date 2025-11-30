@@ -26,36 +26,18 @@ public class MovParser {
 
     private MovStmt statement() {
         if (match(FIND)) return findStatement();
-        if (match(HAVE)) return haveStatment();
-        if (match(SAY)) return sayStatement();
         if (match(WRITE)) return writeStatement();
+        if (isExpressionStart()) return expressionStatement();
         throw error(peek(), "Expect statement.");
     }
 
     private MovStmt findStatement() {
-        System.out.println("in findStatement");
         Kind kind = kind();
         Query query = query();
         MovToken obj = advance();
         MovCond condition = condition();
 
         return new MovStmt.FindS(kind, query, obj, condition);
-    }
-
-    private MovStmt haveStatment() {
-        MovToken identifier = advance();
-        advance(); // consume the '='
-        MovStmt statement = statement();
-
-        return new MovStmt.HaveS(identifier, statement);
-    }
-
-    private MovStmt sayStatement() {
-        MovToken identifier = advance();
-        MovToken ratsum = ratsum();
-        MovToken numstr = numstr();
-        
-        return new MovStmt.SayS(identifier, ratsum, numstr);
     }
 
     private MovStmt writeStatement() {
@@ -65,6 +47,37 @@ public class MovParser {
         MovCond condition = condition();
 
         return new MovStmt.WriteS(kind, query, obj, condition);
+    }
+
+    private MovExpr expression(){
+        if (match(HAVE)) return haveExpression();
+        if (match(SAY)) return sayExpression();
+        throw error(peek(), "Expect expression.");
+    }
+
+    private boolean isExpressionStart() {
+        return check(MovTokenType.HAVE) || check(MovTokenType.SAY);
+    }
+
+    private MovStmt expressionStatement() {
+        MovExpr expr = expression();
+        return new MovStmt.Expression(expr);
+    }
+
+    private MovExpr haveExpression() {
+        MovToken identifier = advance();
+        advance(); // consume the '='
+        MovStmt statement = statement();
+
+        return new MovExpr.HaveE(identifier, statement);
+    }
+
+    private MovExpr sayExpression() {
+        MovToken identifier = advance();
+        MovToken ratsum = ratsum();
+        MovToken numstr = numstr();
+        
+        return new MovExpr.SayE(identifier, ratsum, numstr);
     }
 
     private Kind kind() {
@@ -115,8 +128,6 @@ public class MovParser {
     }
 
     private MovCond condition() {
-        System.out.println("in condition " + peek().type);
-
         MovCond left = primaryCondition();
         while (match(MovTokenType.AND, MovTokenType.OR)) {
             MovToken operator = previous();
@@ -125,8 +136,8 @@ public class MovParser {
         }
         return left;
     }
+    
     private MovCond primaryCondition() {
-        System.out.println("in primarycondition " + peek().type);
         if (match(MovTokenType.NOT)){
             MovCond inner = primaryCondition();
             return new MovCond.NegC(inner);

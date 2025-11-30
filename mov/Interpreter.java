@@ -19,10 +19,14 @@ import mov.MovCond.KindC;
 import mov.MovCond.LtC;
 import mov.MovCond.NegC;
 import mov.MovCond.StrC;
+import mov.MovStmt.Expression;
 import mov.MovStmt.FindS;
-import mov.MovStmt.HaveS;
-import mov.MovStmt.SayS;
 import mov.MovStmt.WriteS;
+
+import mov.MovExpr.HaveE;
+import mov.MovExpr.SayE;
+import mov.MovExpr.Where;
+import mov.MovExpr.WithoutE;
 
 class Movie {
     String movie_name;
@@ -69,7 +73,7 @@ class Movie {
 }
 
 
-public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void> {
+public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void>, MovExpr.Visitor<Object> {
 
     public Set<Movie> allMoviesDB = new HashSet<>();
     public Map<String, Object> globals = new HashMap<>();
@@ -104,7 +108,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
         }
 
-        System.out.println("Loaded " + allMoviesDB.size() + " movies into database");
+        //System.out.println("Loaded " + allMoviesDB.size() + " movies into database");
         
     }
 
@@ -200,173 +204,288 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     @SuppressWarnings("unchecked")
     public Set<Object> findIdentifier(FindS findstmt) {
         Set<Object> result = new HashSet<>();
-        Set<Object> listCreated = (Set<Object>) globals.get(findstmt.identifier.lexeme);
+        Set<Movie> listCreated = (Set<Movie>) globals.get(findstmt.identifier.lexeme);
 
-        switch (findstmt.kind) {
-            case MOVIES:
-                for (Object obj : listCreated) {
-                    if (obj instanceof String) {
-                        switch (findstmt.query) {
-                            case STARRING: 
-                                String star = (String) obj;
-                                result.addAll(searchDB(Kind.MOVIES, Query.STARRING, star));
-                                break;
-                            case DIRECTED_BY:
-                                String director = (String) obj;
-                                result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, director));
-                                break;
-                        }
+        for (Object obj : listCreated) {
+            switch (findstmt.kind) {
+                case MOVIES:
+                    if (findstmt.query == Query.STARRING) {
+                        result.addAll(searchDB(Kind.MOVIES, Query.STARRING, (String) obj));
+                    } else if (findstmt.query == Query.DIRECTED_BY) {
+                        result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, (String) obj));
                     }
-                }
-                break;
-            default:
-                break;
+                    break;
+                case RATINGS:
+                    if (findstmt.query == Query.FOR) {
+                        result.addAll(searchDB(Kind.RATINGS, Query.FOR, (String) obj));
+                    }
+                    break;
+                case GENRE:
+                    if (findstmt.query == Query.FOR) {
+                        result.addAll(searchDB(Kind.GENRE, Query.FOR, (String) obj));
+                    } else if (findstmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.GENRE, Query.OF, (String) obj));
+                    }
+                    break;
+                case STARS:
+                    if (findstmt.query == Query.IN) {
+                        result.addAll(searchDB(Kind.STARS, Query.IN, (String) obj));
+                    }
+                    break;
+                case YEAR:
+                    if (findstmt.query == Query.IN) {
+                        result.addAll(searchDB(Kind.YEAR, Query.IN, (String) obj));
+                    } else if (findstmt.query == Query.FOR) {
+                        result.addAll(searchDB(Kind.YEAR, Query.FOR, (String) obj));
+                    } else if (findstmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.YEAR, Query.OF, (String) obj));
+                    }
+                    break;
+                case SUMMARY:
+                    if (findstmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.SUMMARY, Query.OF, (String) obj));
+                    }
+                    break;
+                case LENGTH:
+                    if (findstmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.LENGTH, Query.OF, (String) obj));
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         return result;
     }
 
-    public Set<Object> searchDB(Kind kind, Query query, String search){
+    public Set<Object> searchDB(Kind kind, Query query, String search) {
         Set<Object> result = new HashSet<>();
-        switch (kind) {
-            case MOVIES:
-                if (query == Query.STARRING) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.stars.contains(search)) {
-                            result.add(m.movie_name);
-                        }
+
+        for (Movie m : allMoviesDB) {
+            switch (kind) {
+                case MOVIES:
+                    if (query == Query.STARRING && m.stars.contains(search)) {
+                        result.add(m.movie_name);
+                    } else if (query == Query.DIRECTED_BY && m.director.contains(search)) {
+                        result.add(m.movie_name);
                     }
-                } else if (query == Query.DIRECTED_BY) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.director.contains(search)) {
-                            result.add(m.movie_name);
-                        }
-                    }
-                } 
-                break;
-            case RATINGS:
-                for (Movie m : allMoviesDB) {
-                    if (m.movie_name.contains(search)) {
+                    break;
+                case RATINGS:
+                    if (query == Query.FOR && m.movie_name.contains(search)) {
                         result.add(m.rating);
                     }
-                }
-                break;
-            case GENRE:
-                if (query == Query.FOR) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.stars.contains(search)) {
-                            //System.out.println("Found movie: " + m.genre);
-                            result.addAll(Arrays.asList(m.genre.split("\\s*,\\s*")));
-                        }
+                    break;
+                case GENRE:
+                    if (query == Query.FOR && m.stars.contains(search)) {
+                        result.addAll(Arrays.asList(m.genre.split("\\s*,\\s*")));
+                    } else if (query == Query.OF && m.movie_name.contains(search)) {
+                        result.addAll(Arrays.asList(m.genre.split("\\s*,\\s*")));
                     }
-                } else if (query == Query.OF) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.movie_name.contains(search)) {
-                            //System.out.println("Found movie: " + m.genre);
-                            result.addAll(Arrays.asList(m.genre.split("\\s*,\\s*")));
-                        }
-                    }
-                }
-            case STARS:
-                for (Movie m : allMoviesDB) {
-                    if (m.movie_name.contains(search)) {
+                    break;
+                case STARS:
+                    if (query == Query.IN && m.movie_name.contains(search)) {
                         result.addAll(Arrays.asList(m.stars.split("\\s*,\\s*")));
                     }
-                }
-                break;
-            case YEAR:
-                if (query == Query.IN) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.movie_name.contains(search) && m.year != 0) {
-                            result.add(m.year);
-                        }
-                    }
-                } else if (query == Query.FOR) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.stars.contains(search) && m.year != 0) {
-                            result.add(m.year);
-                        }
-                    }
-                } else if (query == Query.OF) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.director.contains(search) && m.year != 0) {
-                            result.add(m.year);
-                        }
-                    }
-                }
-                break;
-            case SUMMARY:
-                for (Movie m : allMoviesDB) {
-                    if (m.movie_name.contains(search)) {
+                    break;
+                case SUMMARY:
+                    if (query == Query.OF && m.movie_name.contains(search)) {
                         result.add(m.description);
                     }
-                }
-                break;
-            case LENGTH:
-                for (Movie m : allMoviesDB) {
-                    if (m.movie_name.contains(search)) {
+                    break;
+                case YEAR:
+                    if (query == Query.IN && m.movie_name.contains(search) && m.year != 0) {
+                        result.add(m.year);
+                    } else if (query == Query.FOR && m.stars.contains(search) && m.year != 0) {
+                        result.add(m.year);
+                    } else if (query == Query.OF && m.director.contains(search) && m.year != 0) {
+                        result.add(m.year);
+                    }
+                    break;
+                case LENGTH:
+                    if (query == Query.OF && m.movie_name.contains(search) && m.length != "") {
                         result.add(m.length);
                     }
-                }
-                break;
-            case DIRECTOR:
-                if(query == Query.FOR) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.movie_name.contains(search)) {
-                            result.addAll(Arrays.asList(m.director.split("\\s*,\\s*")));
-                        }
+                    break;
+                case DIRECTOR:
+                    if (query == Query.FOR && m.movie_name.contains(search)) {
+                        result.addAll(Arrays.asList(m.director.split("\\s*,\\s*")));
+                    } else if (query == Query.OF && m.stars.contains(search)) {
+                        result.addAll(Arrays.asList(m.director.split("\\s*,\\s*")));
                     }
-                } else if (query == Query.OF) {
-                    for (Movie m : allMoviesDB) {
-                        if (m.stars.contains(search)) {
-                            result.addAll(Arrays.asList(m.director.split("\\s*,\\s*")));
-                        }
-                    }
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+
+            }
         }
+
+        return result;
+    }
+
+    // needs to be changed to be void to just output the answer to 
+    // the console and not return anything
+    @Override
+    public Object visitWriteSMovStmt(WriteS writestmt) {
+        Set<Object> result = new HashSet<>();
+
+        if (writestmt.identifier.type == STRING) {
+            result = writeString(writestmt);
+        } else if (writestmt.identifier.type == IDENTIFIER) {
+            result = writeIdentifier(writestmt);
+        } else {
+            throw new RuntimeError(writestmt.identifier, "Invalid identifier type in FindS statement");
+        }
+
+        printDisplay(result);
+        return null;
+    }
+
+    // print the result to the console neatly in a table
+    public void printDisplay(Set<Object> result) {
+
+        if (result == null || result.isEmpty()) {
+            System.out.println("No results found.");
+            return;
+        }
+    
+        // Convert to list for stable ordering (optional but nicer)
+        List<Object> list = new ArrayList<>(result);
+    
+        // Compute column widths
+        int indexWidth = String.valueOf(list.size()).length();
+        int valueWidth = 0;
+        for (Object obj : list) {
+            valueWidth = Math.max(valueWidth, obj.toString().length());
+        }
+    
+        // Headers
+        String indexHeader = "No.";
+        String valueHeader = "Result";
+    
+        indexWidth = Math.max(indexWidth, indexHeader.length());
+        valueWidth = Math.max(valueWidth, valueHeader.length());
+    
+        String format = "| %-" + indexWidth + "s | %-" + valueWidth + "s |%n";
+    
+        // Print header
+        System.out.printf(format, indexHeader, valueHeader);
+        System.out.println("+" + "-".repeat(indexWidth + 2) +
+                           "+" + "-".repeat(valueWidth + 2) + "+");
+    
+        // Print rows
+        int i = 1;
+        for (Object obj : list) {
+            System.out.printf(format, i++, obj.toString());
+        }
+    }
+    
+
+    public Set<Object> writeString(WriteS writestmt) {
+        String search = (String) writestmt.identifier.literal;
+        Set<Object> result = new HashSet<>();
+        result = searchDB(writestmt.kind,writestmt.query, search);
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<Object> writeIdentifier(WriteS writestmt) {
+        Set<Object> result = new HashSet<>();
+        Set<Movie> listCreated = (Set<Movie>) globals.get(writestmt.identifier.lexeme);
+
+        for (Object obj : listCreated) {
+            switch (writestmt.kind) {
+                case MOVIES:
+                    if (writestmt.query == Query.STARRING) {
+                        result.addAll(searchDB(Kind.MOVIES, Query.STARRING, (String) obj));
+                    } else if (writestmt.query == Query.DIRECTED_BY) {
+                        result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, (String) obj));
+                    }
+                    break;
+                case RATINGS:
+                    if (writestmt.query == Query.FOR) {
+                        result.addAll(searchDB(Kind.RATINGS, Query.FOR, (String) obj));
+                    }
+                    break;
+                case GENRE:
+                    if (writestmt.query == Query.FOR) {
+                        result.addAll(searchDB(Kind.GENRE, Query.FOR, (String) obj));
+                    } else if (writestmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.GENRE, Query.OF, (String) obj));
+                    }
+                    break;
+                case STARS:
+                    if (writestmt.query == Query.IN) {
+                        result.addAll(searchDB(Kind.STARS, Query.IN, (String) obj));
+                    }
+                    break;
+                case YEAR:
+                    if (writestmt.query == Query.IN) {
+                        result.addAll(searchDB(Kind.YEAR, Query.IN, (String) obj));
+                    } else if (writestmt.query == Query.FOR) {
+                        result.addAll(searchDB(Kind.YEAR, Query.FOR, (String) obj));
+                    } else if (writestmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.YEAR, Query.OF, (String) obj));
+                    }
+                    break;
+                case SUMMARY:
+                    if (writestmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.SUMMARY, Query.OF, (String) obj));
+                    }
+                    break;
+                case LENGTH:
+                    if (writestmt.query == Query.OF) {
+                        result.addAll(searchDB(Kind.LENGTH, Query.OF, (String) obj));
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
         return result;
     }
 
     @Override
-    public Object visitHaveSMovStmt(HaveS havstmt) {
-        
-        String var = havstmt.identifier.lexeme;
-        // Execute the statement to get the result
-        Object result = execute(havstmt.statement);
+    public Object visitExpressionMovStmt(Expression movstmt) {
+        //movstmt.expression.accept(this);
+        return null;
+    }
+
+    @Override
+    public Object visitHaveEMovExpr(HaveE havexpr) {
+        String var = havexpr.identifier.lexeme;
+        Object result = execute(havexpr.statement);
 
         globals.put(var, result);
 
         return null;
-
     }
 
     @Override
-    public Object visitSaySMovStmt(SayS movstmt) {
-        
-        System.out.println("Saying " + movstmt.identifier.lexeme + " "
-                + movstmt.ratsum.lexeme + " " + movstmt.numstr.lexeme);
+    public Object visitSayEMovExpr(SayE sayexpr) {
+        System.out.println("Saying " + sayexpr.identifier.lexeme + " "
+                + sayexpr.ratsum.lexeme + " " + sayexpr.numstr.lexeme);
 
-        return "say interpreted";
-
+        return null;
     }
 
     @Override
-    public Object visitWriteSMovStmt(WriteS movstmt) {
-        
-        System.out.println("Writing " + movstmt.kind + " " + movstmt.query
-                + " " + movstmt.identifier.lexeme + " with condition " + movstmt.condition);
-
-        return "write interpreted";
-
-    }
-
-    @Override
-    public Void visitBinaryC(BinaryC movcond) {
+    public Object visitWhereMovExpr(Where movexpr) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visitBinaryC'");
+        throw new UnsupportedOperationException("Unimplemented method 'visitWhereMovExpr'");
+    }
+
+    @Override
+    public Object visitWithoutEMovExpr(WithoutE movexpr) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitWithoutEMovExpr'");
+    }
+
+    @Override
+    public Void visitBinaryCMovCond(BinaryC movcond) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitBinaryCMovCond'");
     }
     
 }

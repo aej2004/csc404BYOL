@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MovTest {
     public static void main(String[] args) {
-        String filePath = "mov/sample2.mov"; // Adjust the path if necessary
+        String filePath = "mov/sample.mov"; // Adjust the path if necessary
 
         try {
             // Read the content of sample.mov
