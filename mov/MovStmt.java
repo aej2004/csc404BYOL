@@ -8,7 +8,6 @@ import java.util.List;
 abstract class MovStmt {
   interface Visitor<R> {
     R visitFindSMovStmt(FindS movstmt);
-    R visitWriteSMovStmt(WriteS movstmt);
     R visitExpressionMovStmt(Expression movstmt);
   }
   static class FindS extends MovStmt {
@@ -32,29 +31,6 @@ abstract class MovStmt {
     @Override
     public String toString() {
       return "FindS(" + kind + ", " + query + ", " + identifier + ", " + condition + ")";
-    }
-  }
-  static class WriteS extends MovStmt {
-    WriteS(Kind kind, Query query, MovToken identifier, MovCond condition) {
-      this.kind = kind;
-      this.query = query;
-      this.identifier = identifier;
-      this.condition = condition;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWriteSMovStmt(this);
-    }
-
-    final Kind kind;
-    final Query query;
-    final MovToken identifier;
-    final MovCond condition;
-
-    @Override
-    public String toString() {
-      return "WriteS(" + kind + ", " + query + ", " + identifier + ", " + condition + ")";
     }
   }
   static class Expression extends MovStmt {

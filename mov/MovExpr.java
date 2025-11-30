@@ -11,6 +11,7 @@ abstract class MovExpr {
     R visitWithoutEMovExpr(WithoutE movexpr);
     R visitHaveEMovExpr(HaveE movexpr);
     R visitSayEMovExpr(SayE movexpr);
+    R visitWriteEMovExpr(WriteE movexpr);
   }
   static class Where extends MovExpr {
     Where(MovToken keyword, MovExpr condition) {
@@ -88,6 +89,29 @@ abstract class MovExpr {
     @Override
     public String toString() {
       return "SayE(" + identifier + ", " + ratsum + ", " + numstr + ")";
+    }
+  }
+  static class WriteE extends MovExpr {
+    WriteE(Kind kind, Query query, MovToken identifier, MovCond condition) {
+      this.kind = kind;
+      this.query = query;
+      this.identifier = identifier;
+      this.condition = condition;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitWriteEMovExpr(this);
+    }
+
+    final Kind kind;
+    final Query query;
+    final MovToken identifier;
+    final MovCond condition;
+
+    @Override
+    public String toString() {
+      return "WriteE(" + kind + ", " + query + ", " + identifier + ", " + condition + ")";
     }
   }
 

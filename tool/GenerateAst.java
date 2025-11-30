@@ -15,7 +15,6 @@ public class GenerateAst {
 
         defineAst(outputDir, "MovStmt", Arrays.asList(
       "FindS : Kind kind, Query query, MovToken identifier, MovCond condition",
-            "WriteS : Kind kind, Query query, MovToken identifier, MovCond condition",
             "Expression : MovExpr expr"
         ));
 
@@ -31,7 +30,8 @@ public class GenerateAst {
             "Where : MovToken keyword, MovExpr condition",
             "WithoutE : MovToken keyword, MovExpr condition",
             "HaveE : MovToken identifier, MovStmt statement",
-            "SayE : MovToken identifier, MovToken ratsum, MovToken numstr"
+            "SayE : MovToken identifier, MovToken ratsum, MovToken numstr",
+            "WriteE : Kind kind, Query query, MovToken identifier, MovCond condition"
         ));
     }
 

@@ -21,12 +21,12 @@ import mov.MovCond.NegC;
 import mov.MovCond.StrC;
 import mov.MovStmt.Expression;
 import mov.MovStmt.FindS;
-import mov.MovStmt.WriteS;
 
 import mov.MovExpr.HaveE;
 import mov.MovExpr.SayE;
 import mov.MovExpr.Where;
 import mov.MovExpr.WithoutE;
+import mov.MovExpr.WriteE;
 
 class Movie {
     String movie_name;
@@ -323,25 +323,22 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         return result;
     }
 
-    // needs to be changed to be void to just output the answer to 
-    // the console and not return anything
     @Override
-    public Object visitWriteSMovStmt(WriteS writestmt) {
+    public Object visitWriteEMovExpr(WriteE writeexpr) {
         Set<Object> result = new HashSet<>();
 
-        if (writestmt.identifier.type == STRING) {
-            result = writeString(writestmt);
-        } else if (writestmt.identifier.type == IDENTIFIER) {
-            result = writeIdentifier(writestmt);
+        if (writeexpr.identifier.type == STRING) {
+            result = writeString(writeexpr);
+        } else if (writeexpr.identifier.type == IDENTIFIER) {
+            result = writeIdentifier(writeexpr);
         } else {
-            throw new RuntimeError(writestmt.identifier, "Invalid identifier type in FindS statement");
+            throw new RuntimeError(writeexpr.identifier, "Invalid identifier type in FindS statement");
         }
 
         printDisplay(result);
         return null;
     }
 
-    // print the result to the console neatly in a table
     public void printDisplay(Set<Object> result) {
 
         if (result == null || result.isEmpty()) {
@@ -381,60 +378,60 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
     
 
-    public Set<Object> writeString(WriteS writestmt) {
-        String search = (String) writestmt.identifier.literal;
+    public Set<Object> writeString(WriteE writeexpr) {
+        String search = (String) writeexpr.identifier.literal;
         Set<Object> result = new HashSet<>();
-        result = searchDB(writestmt.kind,writestmt.query, search);
+        result = searchDB(writeexpr.kind,writeexpr.query, search);
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    public Set<Object> writeIdentifier(WriteS writestmt) {
+    public Set<Object> writeIdentifier(WriteE writeexpr) {
         Set<Object> result = new HashSet<>();
-        Set<Movie> listCreated = (Set<Movie>) globals.get(writestmt.identifier.lexeme);
+        Set<Movie> listCreated = (Set<Movie>) globals.get(writeexpr.identifier.lexeme);
 
         for (Object obj : listCreated) {
-            switch (writestmt.kind) {
+            switch (writeexpr.kind) {
                 case MOVIES:
-                    if (writestmt.query == Query.STARRING) {
+                    if (writeexpr.query == Query.STARRING) {
                         result.addAll(searchDB(Kind.MOVIES, Query.STARRING, (String) obj));
-                    } else if (writestmt.query == Query.DIRECTED_BY) {
+                    } else if (writeexpr.query == Query.DIRECTED_BY) {
                         result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, (String) obj));
                     }
                     break;
                 case RATINGS:
-                    if (writestmt.query == Query.FOR) {
+                    if (writeexpr.query == Query.FOR) {
                         result.addAll(searchDB(Kind.RATINGS, Query.FOR, (String) obj));
                     }
                     break;
                 case GENRE:
-                    if (writestmt.query == Query.FOR) {
+                    if (writeexpr.query == Query.FOR) {
                         result.addAll(searchDB(Kind.GENRE, Query.FOR, (String) obj));
-                    } else if (writestmt.query == Query.OF) {
+                    } else if (writeexpr.query == Query.OF) {
                         result.addAll(searchDB(Kind.GENRE, Query.OF, (String) obj));
                     }
                     break;
                 case STARS:
-                    if (writestmt.query == Query.IN) {
+                    if (writeexpr.query == Query.IN) {
                         result.addAll(searchDB(Kind.STARS, Query.IN, (String) obj));
                     }
                     break;
                 case YEAR:
-                    if (writestmt.query == Query.IN) {
+                    if (writeexpr.query == Query.IN) {
                         result.addAll(searchDB(Kind.YEAR, Query.IN, (String) obj));
-                    } else if (writestmt.query == Query.FOR) {
+                    } else if (writeexpr.query == Query.FOR) {
                         result.addAll(searchDB(Kind.YEAR, Query.FOR, (String) obj));
-                    } else if (writestmt.query == Query.OF) {
+                    } else if (writeexpr.query == Query.OF) {
                         result.addAll(searchDB(Kind.YEAR, Query.OF, (String) obj));
                     }
                     break;
                 case SUMMARY:
-                    if (writestmt.query == Query.OF) {
+                    if (writeexpr.query == Query.OF) {
                         result.addAll(searchDB(Kind.SUMMARY, Query.OF, (String) obj));
                     }
                     break;
                 case LENGTH:
-                    if (writestmt.query == Query.OF) {
+                    if (writeexpr.query == Query.OF) {
                         result.addAll(searchDB(Kind.LENGTH, Query.OF, (String) obj));
                     }
                     break;

@@ -26,7 +26,6 @@ public class MovParser {
 
     private MovStmt statement() {
         if (match(FIND)) return findStatement();
-        if (match(WRITE)) return writeStatement();
         if (isExpressionStart()) return expressionStatement();
         throw error(peek(), "Expect statement.");
     }
@@ -40,23 +39,15 @@ public class MovParser {
         return new MovStmt.FindS(kind, query, obj, condition);
     }
 
-    private MovStmt writeStatement() {
-        Kind kind = kind();
-        Query query = query();
-        MovToken obj = advance();
-        MovCond condition = condition();
-
-        return new MovStmt.WriteS(kind, query, obj, condition);
-    }
-
     private MovExpr expression(){
         if (match(HAVE)) return haveExpression();
         if (match(SAY)) return sayExpression();
+        if (match(WRITE)) return writeExpression();
         throw error(peek(), "Expect expression.");
     }
 
     private boolean isExpressionStart() {
-        return check(MovTokenType.HAVE) || check(MovTokenType.SAY);
+        return check(MovTokenType.HAVE) || check(MovTokenType.SAY) || check(MovTokenType.WRITE);
     }
 
     private MovStmt expressionStatement() {
@@ -78,6 +69,15 @@ public class MovParser {
         MovToken numstr = numstr();
         
         return new MovExpr.SayE(identifier, ratsum, numstr);
+    }
+
+    private MovExpr writeExpression() {
+        Kind kind = kind();
+        Query query = query();
+        MovToken obj = advance();
+        MovCond condition = condition();
+
+        return new MovExpr.WriteE(kind, query, obj, condition);
     }
 
     private Kind kind() {
