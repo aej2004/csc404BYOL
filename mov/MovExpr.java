@@ -7,49 +7,9 @@ import java.util.List;
 
 abstract class MovExpr {
   interface Visitor<R> {
-    R visitWhereMovExpr(Where movexpr);
-    R visitWithoutEMovExpr(WithoutE movexpr);
     R visitHaveEMovExpr(HaveE movexpr);
     R visitSayEMovExpr(SayE movexpr);
     R visitWriteEMovExpr(WriteE movexpr);
-  }
-  static class Where extends MovExpr {
-    Where(MovToken keyword, MovExpr condition) {
-      this.keyword = keyword;
-      this.condition = condition;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWhereMovExpr(this);
-    }
-
-    final MovToken keyword;
-    final MovExpr condition;
-
-    @Override
-    public String toString() {
-      return "Where(" + keyword + ", " + condition + ")";
-    }
-  }
-  static class WithoutE extends MovExpr {
-    WithoutE(MovToken keyword, MovExpr condition) {
-      this.keyword = keyword;
-      this.condition = condition;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitWithoutEMovExpr(this);
-    }
-
-    final MovToken keyword;
-    final MovExpr condition;
-
-    @Override
-    public String toString() {
-      return "WithoutE(" + keyword + ", " + condition + ")";
-    }
   }
   static class HaveE extends MovExpr {
     HaveE(MovToken identifier, MovStmt statement) {

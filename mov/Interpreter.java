@@ -24,8 +24,6 @@ import mov.MovStmt.FindS;
 
 import mov.MovExpr.HaveE;
 import mov.MovExpr.SayE;
-import mov.MovExpr.Where;
-import mov.MovExpr.WithoutE;
 import mov.MovExpr.WriteE;
 
 class Movie {
@@ -179,6 +177,12 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @Override
+    public Void visitBinaryCMovCond(BinaryC movcond) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitBinaryCMovCond'");
+    }
+
+    @Override
     public Set<Object> visitFindSMovStmt(FindS findstmt) {
         Set<Object> result = new HashSet<>();
 
@@ -189,8 +193,13 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         } else {
             throw new RuntimeError(findstmt.identifier, "Invalid identifier type in FindS statement");
         }
+        
+        // if the condition is not null, apply it to filter results
+        if (findstmt.condition != null) {
 
-        System.out.println(result);
+        }
+
+        printDisplay(result);
         return result;
     }
 
@@ -325,6 +334,7 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
     @Override
     public Object visitWriteEMovExpr(WriteE writeexpr) {
+        System.out.println("in write expression");
         Set<Object> result = new HashSet<>();
 
         if (writeexpr.identifier.type == STRING) {
@@ -444,8 +454,8 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
 
     @Override
-    public Object visitExpressionMovStmt(Expression movstmt) {
-        //movstmt.expression.accept(this);
+    public Object visitExpressionMovStmt(Expression movexpr) {
+        movexpr.expr.accept(this);
         return null;
     }
 
@@ -461,28 +471,30 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
     @Override
     public Object visitSayEMovExpr(SayE sayexpr) {
-        System.out.println("Saying " + sayexpr.identifier.lexeme + " "
-                + sayexpr.ratsum.lexeme + " " + sayexpr.numstr.lexeme);
+        Object kind = sayexpr.identifier.literal;
+        Object change = sayexpr.numstr.literal;
+        Set<Movie> m = new HashSet<>();
+
+        for (Movie obj : allMoviesDB) {
+            if (obj.movie_name.equals(kind)) {
+                m.add(obj);
+            }
+        }
+
+        for (Movie mov : m) {
+            switch (sayexpr.ratsum.type) {
+                case RATINGS:
+                    mov.rating = (Double) change;
+                    break;
+                case SUMMARY:
+                    mov.description = (String) change;
+                    break;
+                default:
+                    throw new RuntimeError(sayexpr.ratsum, "Invalid ratsum type in SayE expression");
+            }
+        }
 
         return null;
-    }
-
-    @Override
-    public Object visitWhereMovExpr(Where movexpr) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visitWhereMovExpr'");
-    }
-
-    @Override
-    public Object visitWithoutEMovExpr(WithoutE movexpr) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visitWithoutEMovExpr'");
-    }
-
-    @Override
-    public Void visitBinaryCMovCond(BinaryC movcond) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visitBinaryCMovCond'");
     }
     
 }

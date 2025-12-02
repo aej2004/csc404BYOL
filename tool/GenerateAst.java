@@ -20,15 +20,13 @@ public class GenerateAst {
 
         defineAst(outputDir, "MovCond", Arrays.asList(
             "NegC : MovCond condition",
-            "StrC : String str, Kind kind",
+            "StrC : String str",
             "KindC : Kind kind, Query query, String str",
             "LtC : MovCond left, MovCond right, MovToken operator",
             "BinaryC : MovCond left, MovCond right, MovToken operator"
         ));
 
         defineAst(outputDir, "MovExpr", Arrays.asList(
-            "Where : MovToken keyword, MovExpr condition",
-            "WithoutE : MovToken keyword, MovExpr condition",
             "HaveE : MovToken identifier, MovStmt statement",
             "SayE : MovToken identifier, MovToken ratsum, MovToken numstr",
             "WriteE : Kind kind, Query query, MovToken identifier, MovCond condition"

@@ -31,9 +31,8 @@ abstract class MovCond {
     }
   }
   static class StrC extends MovCond {
-    StrC(String str, Kind kind) {
+    StrC(String str) {
       this.str = str;
-      this.kind = kind;
     }
 
     @Override
@@ -42,11 +41,10 @@ abstract class MovCond {
     }
 
     final String str;
-    final Kind kind;
 
     @Override
     public String toString() {
-      return "StrC(" + str + ", " + kind + ")";
+      return "StrC(" + str + ")";
     }
   }
   static class KindC extends MovCond {

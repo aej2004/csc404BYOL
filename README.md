@@ -59,7 +59,7 @@ The string or the list of strings that go with the kind and string given.
 ```
 have actors = find stars in "Sing 2"
 find movies starring actors
-have tomMovies = find movies where "tom hanks"find stars in tomMovies
+have tomMovies = find movies where "tom hanks"
  without "tom hanks"
 have lkActors = find stars in "The Lion King"
 find movies starring lkActors without "The Lion King"
@@ -74,25 +74,37 @@ Stores the string, list of strings, or double under the given variables name.
 ### Example Program 3 Setter
 
 ```
+find ratings for "Sing 2"
 say "Sing 2" ratings 9.5
-find ratings for "Tori Kelly"
+find ratings for "Sing 2"
 ```
 
 <p>Outputs:</p>
 
 ```
-Returns the average rating for Tori Kelly changed to include the new rating the movie "Sing 2" that she's in.
+| No. | Result |
++-----+--------+
+| 1   | 7.4    |
+| No. | Result |
++-----+--------+
+| 1   | 9.5    |
 ```
 
 ```
-say "The Little Mermaid" summary "A great child friendly movie about ..."
-find summary for "The Little Mermaid"
+find summary of "Sing 2"
+say "Sing 2" summary "Hello"
+find summary of "Sing 2"
 ```
 
 <p>Outputs:</p>
 
 ```
-Returns the new summary for the film that the person just wrote. 
+| No. | Result                                                                                                                  |
++-----+-------------------------------------------------------------------------------------------------------------------------+
+| 1   | Buster Moon and his friends must persuade reclusive rock star Clay Calloway to join them for the opening of a new show. |
+| No. | Result |
++-----+--------+
+| 1   | Hello  |
 ```
 
 ### Example Program 4 Return/Print Output

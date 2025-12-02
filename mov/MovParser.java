@@ -171,9 +171,7 @@ public class MovParser {
     public MovCond withoutCondition() {
         System.out.println(peek().type);
         if (match(MovTokenType.STRING)) {
-            String str = previous().lexeme;
-            Kind kind = kind();
-            return new MovCond.StrC(str, kind);
+            return strCondition();
         } else {
             return null; // no condition after WITHOUT
         }
@@ -186,8 +184,7 @@ public class MovParser {
     private MovCond strCondition() {
         MovToken strToken = advance(); // STRING token
         String str = strToken.lexeme;
-        Kind kind = kind();
-        return new MovCond.StrC(str, kind);
+        return new MovCond.StrC(str);
     }
     private MovCond kindCondition() {
         Kind kind = kind();
