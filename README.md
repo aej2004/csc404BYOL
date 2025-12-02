@@ -51,7 +51,7 @@ find director of "Tori Kelly"
 <p>Outputs:</p>
 
 ```
-The string or the list of strings that go with the kind and string given. 
+nothing just used to stores the values
 ```
 
 ### Example Program 2 Declaration
@@ -68,7 +68,24 @@ find movies starring lkActors without "The Lion King"
 <p>Outputs:</p>
 
 ```
-Stores the string, list of strings, or double under the given variables name. 
+| No. | Result              |
++-----+---------------------+
+| 1   | Matthew McConaughey |
+| 2   | Tori Kelly          |
+| 3   | Reese Witherspoon   |
+| 4   | Scarlett Johansson  |
+| No. | Result                                       |
++-----+----------------------------------------------+
+| 1   | Interstellar                                 |
+| 2   | The Dark Tower                               |
+| 3   | Legally Blonde                               |
+| 4   | Girl with a Pearl Earring                    |
+| 5   | Rendition                                    |
+| 6   | Reign of Fire                                |
+| 7   | Serenity                                     |
+| 8   | Best Laid Plans                              |
+| 9   | Asteroid City                                |
+......
 ```
 
 ### Example Program 3 Setter
@@ -110,7 +127,6 @@ find summary of "Sing 2"
 ### Example Program 4 Return/Print Output
 
 ```
-write movies starring "Tom Hanks"
 write movies directed by "Ryan Coogler"
 write stars in "The Lion King" where movie is "The Little Mermaid"
 ```
@@ -118,8 +134,13 @@ write stars in "The Lion King" where movie is "The Little Mermaid"
 <p>Outputs:</p>
 
 ```
-outputs all the movies that star Tom Hanks
-outputs all the stars that are in both movies
+| No. | Result                         |
++-----+--------------------------------+
+| 1   | Creed                          |
+| 2   | Wrong Answer                   |
+| 3   | Fruitvale Station              |
+| 4   | Black Panther                  |
+| 5   | Black Panther: Wakanda Forever |
 ```
 
 ### Example Program 5 Conditionals

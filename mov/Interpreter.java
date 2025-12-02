@@ -199,7 +199,6 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
         }
 
-        printDisplay(result);
         return result;
     }
 
