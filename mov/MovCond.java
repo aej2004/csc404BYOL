@@ -7,45 +7,7 @@ import java.util.List;
 
 abstract class MovCond {
   interface Visitor<R> {
-    R visitNegCMovCond(NegC movcond);
-    R visitStrCMovCond(StrC movcond);
     R visitKindCMovCond(KindC movcond);
-    R visitLtCMovCond(LtC movcond);
-    R visitBinaryCMovCond(BinaryC movcond);
-  }
-  static class NegC extends MovCond {
-    NegC(MovCond condition) {
-      this.condition = condition;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitNegCMovCond(this);
-    }
-
-    final MovCond condition;
-
-    @Override
-    public String toString() {
-      return "NegC(" + condition + ")";
-    }
-  }
-  static class StrC extends MovCond {
-    StrC(String str) {
-      this.str = str;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitStrCMovCond(this);
-    }
-
-    final String str;
-
-    @Override
-    public String toString() {
-      return "StrC(" + str + ")";
-    }
   }
   static class KindC extends MovCond {
     KindC(Kind kind, Query query, String str) {
@@ -66,48 +28,6 @@ abstract class MovCond {
     @Override
     public String toString() {
       return "KindC(" + kind + ", " + query + ", " + str + ")";
-    }
-  }
-  static class LtC extends MovCond {
-    LtC(MovCond left, MovCond right, MovToken operator) {
-      this.left = left;
-      this.right = right;
-      this.operator = operator;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitLtCMovCond(this);
-    }
-
-    final MovCond left;
-    final MovCond right;
-    final MovToken operator;
-
-    @Override
-    public String toString() {
-      return "LtC(" + left + ", " + right + ", " + operator + ")";
-    }
-  }
-  static class BinaryC extends MovCond {
-    BinaryC(MovCond left, MovCond right, MovToken operator) {
-      this.left = left;
-      this.right = right;
-      this.operator = operator;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitBinaryCMovCond(this);
-    }
-
-    final MovCond left;
-    final MovCond right;
-    final MovToken operator;
-
-    @Override
-    public String toString() {
-      return "BinaryC(" + left + ", " + right + ", " + operator + ")";
     }
   }
 

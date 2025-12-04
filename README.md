@@ -12,19 +12,19 @@
 ## Grammar: 
 
 ```
-findStmt -> "find" kind query (str | identifier) (where | without. <condition>)
+findStmt -> "find" kind query (str | identifier) where (<condition>)
 
 haveStmt -> "have" ... = <findStmt>
 
 sayStmt -> "say" str (rating | summary) (num | str)
 
-writeStmt -> "write" kind query str (where | without. <condition>)
+writeStmt -> "write" kind query str where (<condition>)
 
-kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director" | age-appropriate
+kind -> "movies" | "ratings" | "genre" | "stars" | "year" | "summary" | "length" | "director"
 
-query -> "starring" | "directed by" | "for" | "in" | "of" | "is"
+query -> "starring" | "directed by" | "for" | "in" | "of" | "is" | "not"
 
-condition -> str | kind query str | <conditon> > <condition>
+condition -> kind not str | kind is str
 ```
 
 ## Examples: 
@@ -149,7 +149,9 @@ write movies directed by "Ryan Coogler"
 ### Example Program 5 Conditionals
 
 ```
-write movies directed by "Ryan Coogler" without "Black"
+write movies directed by "Ryan Coogler" where movies not "Black"
+write movies starring "Tom Hanks" where genre is "Animation"
+write ratings for "Toy Story" where ratings is "7."
 ```
 
 <p>Outputs:</p>
@@ -160,4 +162,15 @@ write movies directed by "Ryan Coogler" without "Black"
 | 1   | Creed             |
 | 2   | Wrong Answer      |
 | 3   | Fruitvale Station |
+| No. | Result            |
++-----+-------------------+
+| 1   | Toy Story         |
+| 2   | Toy Story 2       |
+| 3   | The Polar Express |
+| 4   | Toy Story 4       |
+| 5   | Toy Story 3       |
+| No. | Result |
++-----+--------+
+| 1   | 7.7    |
+| 2   | 7.9    |
 ```

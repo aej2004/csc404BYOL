@@ -31,6 +31,7 @@ public class MovScanner {
         keywords.put("with", WITH);
         keywords.put("starring", STARRING);
         keywords.put("directed_by", DIRECTED_BY);
+        keywords.put("not", NOT);
 
         keywords.put("movies", MOVIES);
         keywords.put("ratings", RATINGS);

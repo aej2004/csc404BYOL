@@ -6,5 +6,6 @@ enum Query {
     FOR,
     IN,
     OF,
-    IS
+    IS,
+    NOT
 }

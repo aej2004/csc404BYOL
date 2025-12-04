@@ -19,11 +19,7 @@ public class GenerateAst {
         ));
 
         defineAst(outputDir, "MovCond", Arrays.asList(
-            "NegC : MovCond condition",
-            "StrC : String str",
-            "KindC : Kind kind, Query query, String str",
-            "LtC : MovCond left, MovCond right, MovToken operator",
-            "BinaryC : MovCond left, MovCond right, MovToken operator"
+            "KindC : Kind kind, Query query, String str"
         ));
 
         defineAst(outputDir, "MovExpr", Arrays.asList(

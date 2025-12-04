@@ -14,11 +14,7 @@ import java.util.Set;
 
 import javax.xml.crypto.Data;
 
-import mov.MovCond.BinaryC;
 import mov.MovCond.KindC;
-import mov.MovCond.LtC;
-import mov.MovCond.NegC;
-import mov.MovCond.StrC;
 import mov.MovStmt.Expression;
 import mov.MovStmt.FindS;
 
@@ -139,62 +135,47 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         return stmt.accept(this);
     }
 
-    public void findCondition(MovCond condition) {
-        switch (condition.getClass().getSimpleName()) {
-            case "StrC":
-                condition.accept(this);
-                break;
-            default:
-                throw new RuntimeError(null, "Unknown condition type");
-        }        
-    }
-
     @Override
-    public Void visitNegCMovCond(NegC movcond) {
+    public Void visitKindCMovCond(KindC movcond) {
         
-        System.out.println("Visiting NegC condition");
-
-        return null;
-
-    }
-
-    @Override
-    public Void visitStrCMovCond(StrC movcond) {
         String search = movcond.str.replace("\"", "");
 
-        for(Movie m : allMoviesDB) {
-
-            if (!(m.movie_name.contains(search)) && !(m.director.contains(search)) 
-                    && !(m.stars.contains(search))){
-                currentMoviesDB.add(m);
+        if (movcond.query == Query.IS) {
+            for(Movie m : allMoviesDB) {
+                if (movcond.kind == Kind.GENRE && (m.genre.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.DIRECTOR && (m.director.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.STARS && (m.stars.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.YEAR && Integer.toString(m.year).contains(search)) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.MOVIES && (m.movie_name.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.RATINGS && Double.toString(m.rating).contains(search)) {
+                    currentMoviesDB.add(m);
+                }
+            }
+        } else if (movcond.query == Query.NOT) {
+            for(Movie m : allMoviesDB) {
+                if (movcond.kind == Kind.GENRE && !(m.genre.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.DIRECTOR && !(m.director.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.STARS && !(m.stars.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.YEAR && !Integer.toString(m.year).contains(search)) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.MOVIES && !(m.movie_name.contains(search))) {
+                    currentMoviesDB.add(m);
+                } else if (movcond.kind == Kind.RATINGS && !Double.toString(m.rating).contains(search)) {
+                    currentMoviesDB.add(m);
+                }
             }
         }
 
         return null;
-    }
 
-    @Override
-    public Void visitKindCMovCond(KindC movcond) {
-        
-        System.out.println("Visiting KindC condition");
-
-        return null;
-
-    }
-
-    @Override
-    public Void visitLtCMovCond(LtC movcond) {
-        
-        System.out.println("Visiting LtC condition");
-
-        return null;
-
-    }
-
-    @Override
-    public Void visitBinaryCMovCond(BinaryC movcond) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visitBinaryCMovCond'");
     }
 
     @Override
@@ -210,7 +191,8 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 throw new RuntimeError(findstmt.identifier, "Invalid identifier type in FindS statement");
             }
         } else if (findstmt.condition != null) {
-            findCondition(findstmt.condition);
+            findstmt.condition.accept(this);
+
             if (findstmt.identifier.type == STRING) {
                 result = findString(findstmt, currentMoviesDB);
             } else if (findstmt.identifier.type == IDENTIFIER) {
@@ -218,6 +200,8 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
             } else {
                 throw new RuntimeError(findstmt.identifier, "Invalid identifier type in FindS statement");
             }
+
+            currentMoviesDB.clear();
         }
 
         return result;
@@ -364,7 +348,8 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
                 throw new RuntimeError(writeexpr.identifier, "Invalid identifier type in FindS statement");
             }
         } else if (writeexpr.condition != null) {
-            findCondition(writeexpr.condition);
+            writeexpr.condition.accept(this);
+
             if (writeexpr.identifier.type == STRING) {
                 result = writeString(writeexpr, currentMoviesDB);
             } else if (writeexpr.identifier.type == IDENTIFIER) {
@@ -372,6 +357,8 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
             } else {
                 throw new RuntimeError(writeexpr.identifier, "Invalid identifier type in FindS statement");
             }
+
+            currentMoviesDB.clear();
         }
 
         printDisplay(result);
