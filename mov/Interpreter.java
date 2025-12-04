@@ -74,6 +74,7 @@ class Movie {
 public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Void>, MovExpr.Visitor<Object> {
 
     public Set<Movie> allMoviesDB = new HashSet<>();
+    public Set<Movie> currentMoviesDB = new HashSet<>();
     public Map<String, Object> globals = new HashMap<>();
 
     public Interpreter() {
@@ -138,7 +139,15 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         return stmt.accept(this);
     }
 
-
+    public void findCondition(MovCond condition) {
+        switch (condition.getClass().getSimpleName()) {
+            case "StrC":
+                condition.accept(this);
+                break;
+            default:
+                throw new RuntimeError(null, "Unknown condition type");
+        }        
+    }
 
     @Override
     public Void visitNegCMovCond(NegC movcond) {
@@ -151,11 +160,17 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
     @Override
     public Void visitStrCMovCond(StrC movcond) {
-        
-        System.out.println("Visiting StrC condition");
+        String search = movcond.str.replace("\"", "");
+
+        for(Movie m : allMoviesDB) {
+
+            if (!(m.movie_name.contains(search)) && !(m.director.contains(search)) 
+                    && !(m.stars.contains(search))){
+                currentMoviesDB.add(m);
+            }
+        }
 
         return null;
-
     }
 
     @Override
@@ -186,31 +201,37 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     public Set<Object> visitFindSMovStmt(FindS findstmt) {
         Set<Object> result = new HashSet<>();
 
-        if (findstmt.identifier.type == STRING) {
-            result = findString(findstmt);
-        } else if (findstmt.identifier.type == IDENTIFIER) {
-            result = findIdentifier(findstmt);
-        } else {
-            throw new RuntimeError(findstmt.identifier, "Invalid identifier type in FindS statement");
-        }
-        
-        // if the condition is not null, apply it to filter results
-        if (findstmt.condition != null) {
-
+        if (findstmt.condition == null) {
+            if (findstmt.identifier.type == STRING) {
+                result = findString(findstmt, allMoviesDB);
+            } else if (findstmt.identifier.type == IDENTIFIER) {
+                result = findIdentifier(findstmt, allMoviesDB);
+            } else {
+                throw new RuntimeError(findstmt.identifier, "Invalid identifier type in FindS statement");
+            }
+        } else if (findstmt.condition != null) {
+            findCondition(findstmt.condition);
+            if (findstmt.identifier.type == STRING) {
+                result = findString(findstmt, currentMoviesDB);
+            } else if (findstmt.identifier.type == IDENTIFIER) {
+                result = findIdentifier(findstmt, currentMoviesDB);
+            } else {
+                throw new RuntimeError(findstmt.identifier, "Invalid identifier type in FindS statement");
+            }
         }
 
         return result;
     }
 
-    public Set<Object> findString(FindS findstmt) {
+    public Set<Object> findString(FindS findstmt, Set<Movie> moviesDB) {
         String search = (String) findstmt.identifier.literal;
         Set<Object> result = new HashSet<>();
-        result = searchDB(findstmt.kind,findstmt.query, search);
+        result = searchDB(findstmt.kind,findstmt.query, search, moviesDB);
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    public Set<Object> findIdentifier(FindS findstmt) {
+    public Set<Object> findIdentifier(FindS findstmt, Set<Movie> moviesDB) {
         Set<Object> result = new HashSet<>();
         Set<Movie> listCreated = (Set<Movie>) globals.get(findstmt.identifier.lexeme);
 
@@ -218,45 +239,45 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
             switch (findstmt.kind) {
                 case MOVIES:
                     if (findstmt.query == Query.STARRING) {
-                        result.addAll(searchDB(Kind.MOVIES, Query.STARRING, (String) obj));
+                        result.addAll(searchDB(Kind.MOVIES, Query.STARRING, (String) obj, moviesDB));
                     } else if (findstmt.query == Query.DIRECTED_BY) {
-                        result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, (String) obj));
+                        result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, (String) obj, moviesDB));
                     }
                     break;
                 case RATINGS:
                     if (findstmt.query == Query.FOR) {
-                        result.addAll(searchDB(Kind.RATINGS, Query.FOR, (String) obj));
+                        result.addAll(searchDB(Kind.RATINGS, Query.FOR, (String) obj, moviesDB));
                     }
                     break;
                 case GENRE:
                     if (findstmt.query == Query.FOR) {
-                        result.addAll(searchDB(Kind.GENRE, Query.FOR, (String) obj));
+                        result.addAll(searchDB(Kind.GENRE, Query.FOR, (String) obj, moviesDB));
                     } else if (findstmt.query == Query.OF) {
-                        result.addAll(searchDB(Kind.GENRE, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.GENRE, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 case STARS:
                     if (findstmt.query == Query.IN) {
-                        result.addAll(searchDB(Kind.STARS, Query.IN, (String) obj));
+                        result.addAll(searchDB(Kind.STARS, Query.IN, (String) obj, moviesDB));
                     }
                     break;
                 case YEAR:
                     if (findstmt.query == Query.IN) {
-                        result.addAll(searchDB(Kind.YEAR, Query.IN, (String) obj));
+                        result.addAll(searchDB(Kind.YEAR, Query.IN, (String) obj, moviesDB));
                     } else if (findstmt.query == Query.FOR) {
-                        result.addAll(searchDB(Kind.YEAR, Query.FOR, (String) obj));
+                        result.addAll(searchDB(Kind.YEAR, Query.FOR, (String) obj, moviesDB));
                     } else if (findstmt.query == Query.OF) {
-                        result.addAll(searchDB(Kind.YEAR, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.YEAR, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 case SUMMARY:
                     if (findstmt.query == Query.OF) {
-                        result.addAll(searchDB(Kind.SUMMARY, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.SUMMARY, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 case LENGTH:
                     if (findstmt.query == Query.OF) {
-                        result.addAll(searchDB(Kind.LENGTH, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.LENGTH, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 default:
@@ -267,10 +288,10 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
         return result;
     }
 
-    public Set<Object> searchDB(Kind kind, Query query, String search) {
+    public Set<Object> searchDB(Kind kind, Query query, String search, Set<Movie> moviesDB) {
         Set<Object> result = new HashSet<>();
 
-        for (Movie m : allMoviesDB) {
+        for (Movie m : moviesDB) {
             switch (kind) {
                 case MOVIES:
                     if (query == Query.STARRING && m.stars.contains(search)) {
@@ -333,15 +354,24 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
 
     @Override
     public Object visitWriteEMovExpr(WriteE writeexpr) {
-        System.out.println("in write expression");
         Set<Object> result = new HashSet<>();
-
-        if (writeexpr.identifier.type == STRING) {
-            result = writeString(writeexpr);
-        } else if (writeexpr.identifier.type == IDENTIFIER) {
-            result = writeIdentifier(writeexpr);
-        } else {
-            throw new RuntimeError(writeexpr.identifier, "Invalid identifier type in FindS statement");
+        if (writeexpr.condition == null) {
+            if (writeexpr.identifier.type == STRING) {
+                result = writeString(writeexpr, allMoviesDB);
+            } else if (writeexpr.identifier.type == IDENTIFIER) {
+                result = writeIdentifier(writeexpr, allMoviesDB);
+            } else {
+                throw new RuntimeError(writeexpr.identifier, "Invalid identifier type in FindS statement");
+            }
+        } else if (writeexpr.condition != null) {
+            findCondition(writeexpr.condition);
+            if (writeexpr.identifier.type == STRING) {
+                result = writeString(writeexpr, currentMoviesDB);
+            } else if (writeexpr.identifier.type == IDENTIFIER) {
+                result = writeIdentifier(writeexpr, currentMoviesDB);
+            } else {
+                throw new RuntimeError(writeexpr.identifier, "Invalid identifier type in FindS statement");
+            }
         }
 
         printDisplay(result);
@@ -387,15 +417,15 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
     }
     
 
-    public Set<Object> writeString(WriteE writeexpr) {
+    public Set<Object> writeString(WriteE writeexpr, Set<Movie> moviesDB) {
         String search = (String) writeexpr.identifier.literal;
         Set<Object> result = new HashSet<>();
-        result = searchDB(writeexpr.kind,writeexpr.query, search);
+        result = searchDB(writeexpr.kind,writeexpr.query, search, moviesDB);
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    public Set<Object> writeIdentifier(WriteE writeexpr) {
+    public Set<Object> writeIdentifier(WriteE writeexpr, Set<Movie> moviesDB) {
         Set<Object> result = new HashSet<>();
         Set<Movie> listCreated = (Set<Movie>) globals.get(writeexpr.identifier.lexeme);
 
@@ -403,45 +433,45 @@ public class Interpreter implements MovStmt.Visitor<Object>, MovCond.Visitor<Voi
             switch (writeexpr.kind) {
                 case MOVIES:
                     if (writeexpr.query == Query.STARRING) {
-                        result.addAll(searchDB(Kind.MOVIES, Query.STARRING, (String) obj));
+                        result.addAll(searchDB(Kind.MOVIES, Query.STARRING, (String) obj, moviesDB));
                     } else if (writeexpr.query == Query.DIRECTED_BY) {
-                        result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, (String) obj));
+                        result.addAll(searchDB(Kind.MOVIES, Query.DIRECTED_BY, (String) obj, moviesDB));
                     }
                     break;
                 case RATINGS:
                     if (writeexpr.query == Query.FOR) {
-                        result.addAll(searchDB(Kind.RATINGS, Query.FOR, (String) obj));
+                        result.addAll(searchDB(Kind.RATINGS, Query.FOR, (String) obj, moviesDB));
                     }
                     break;
                 case GENRE:
                     if (writeexpr.query == Query.FOR) {
-                        result.addAll(searchDB(Kind.GENRE, Query.FOR, (String) obj));
+                        result.addAll(searchDB(Kind.GENRE, Query.FOR, (String) obj, moviesDB));
                     } else if (writeexpr.query == Query.OF) {
-                        result.addAll(searchDB(Kind.GENRE, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.GENRE, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 case STARS:
                     if (writeexpr.query == Query.IN) {
-                        result.addAll(searchDB(Kind.STARS, Query.IN, (String) obj));
+                        result.addAll(searchDB(Kind.STARS, Query.IN, (String) obj, moviesDB));
                     }
                     break;
                 case YEAR:
                     if (writeexpr.query == Query.IN) {
-                        result.addAll(searchDB(Kind.YEAR, Query.IN, (String) obj));
+                        result.addAll(searchDB(Kind.YEAR, Query.IN, (String) obj, moviesDB));
                     } else if (writeexpr.query == Query.FOR) {
-                        result.addAll(searchDB(Kind.YEAR, Query.FOR, (String) obj));
+                        result.addAll(searchDB(Kind.YEAR, Query.FOR, (String) obj, moviesDB));
                     } else if (writeexpr.query == Query.OF) {
-                        result.addAll(searchDB(Kind.YEAR, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.YEAR, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 case SUMMARY:
                     if (writeexpr.query == Query.OF) {
-                        result.addAll(searchDB(Kind.SUMMARY, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.SUMMARY, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 case LENGTH:
                     if (writeexpr.query == Query.OF) {
-                        result.addAll(searchDB(Kind.LENGTH, Query.OF, (String) obj));
+                        result.addAll(searchDB(Kind.LENGTH, Query.OF, (String) obj, moviesDB));
                     }
                     break;
                 default:

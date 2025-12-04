@@ -181,6 +181,7 @@ public class MovParser {
         MovCond condition = condition(); // parse inner condition
         return new MovCond.NegC(condition);
     }
+    
     private MovCond strCondition() {
         MovToken strToken = advance(); // STRING token
         String str = strToken.lexeme;

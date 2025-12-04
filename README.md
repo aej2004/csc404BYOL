@@ -58,22 +58,14 @@ nothing just used to stores the values
 
 ```
 have actors = find stars in "Sing 2"
-find movies starring actors
-have tomMovies = find movies where "tom hanks"
- without "tom hanks"
+write movies starring actors
 have lkActors = find stars in "The Lion King"
-find movies starring lkActors without "The Lion King"
+write movies starring lkActors without "The Lion King"
 ```
 
 <p>Outputs:</p>
 
 ```
-| No. | Result              |
-+-----+---------------------+
-| 1   | Matthew McConaughey |
-| 2   | Tori Kelly          |
-| 3   | Reese Witherspoon   |
-| 4   | Scarlett Johansson  |
 | No. | Result                                       |
 +-----+----------------------------------------------+
 | 1   | Interstellar                                 |
@@ -86,6 +78,18 @@ find movies starring lkActors without "The Lion King"
 | 8   | Best Laid Plans                              |
 | 9   | Asteroid City                                |
 ......
+| No. | Result                                       |
++-----+----------------------------------------------+
+| 1   | The Lincoln Lawyer                           |
+| 2   | Interstellar                                 |
+| 3   | The Dark Tower                               |
+| 4   | Kubo and the Two Strings                     |
+| 5   | Don Jon                                      |
+| 6   | Legally Blonde                               |
+| 7   | Girl with a Pearl Earring                    |
+| 8   | Rendition                                    |
+| 9   | Reign of Fire                                |
+.....
 ```
 
 ### Example Program 3 Setter
@@ -128,7 +132,6 @@ find summary of "Sing 2"
 
 ```
 write movies directed by "Ryan Coogler"
-write stars in "The Lion King" where movie is "The Little Mermaid"
 ```
 
 <p>Outputs:</p>
@@ -146,12 +149,15 @@ write stars in "The Lion King" where movie is "The Little Mermaid"
 ### Example Program 5 Conditionals
 
 ```
-find movies starring "Tom Hanks" where genre is "action"
-find stars in "The Lion King" where movies starring "Tom Hanks"
+write movies directed by "Ryan Coogler" without "Black"
 ```
 
 <p>Outputs:</p>
 
 ```
-returns the movie with the given condition for the certain kind within the movie. 
+| No. | Result            |
++-----+-------------------+
+| 1   | Creed             |
+| 2   | Wrong Answer      |
+| 3   | Fruitvale Station |
 ```

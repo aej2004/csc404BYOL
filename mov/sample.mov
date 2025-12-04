@@ -1,1 +1,4 @@
-write movies directed by "Ryan Coogler"
+have actors = find stars in "Sing 2"
+write movies starring actors
+have lkActors = find stars in "Sing 2"
+write movies starring lkActors without "Sing 2"
